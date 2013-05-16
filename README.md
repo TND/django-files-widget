@@ -3,6 +3,8 @@ django-files-widget
 
 Django model fields and admin widgets for multiple files/images upload
 
+This is currently a pre-alpha release.
+
 Features
 --------
 
