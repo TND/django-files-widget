@@ -1,0 +1,230 @@
+.files-widget {
+	display: inline-block;
+}
+
+.files-widget .controls {
+	padding-bottom: 8px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.files-widget .controls .fake-files-input {
+	margin-top: 0;
+	margin-bottom: 0;
+	padding: 4px 8px 3px;
+	width: auto;
+	color: #fff;
+	border: none;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background: #acd7e5;
+	cursor: pointer;
+	background: -webkit-gradient(linear, left top, left bottom, from(#acd7e5), to(#a4cedb));
+	margin-left: 2px;
+	position: relative;
+	display: inline-block;
+	vertical-align: middle;
+	font-weight: bold;
+	overflow: hidden;
+}
+
+.files-widget .controls .fake-files-input:hover {
+    background: #444;
+}
+
+.files-widget .controls .files-input {
+	padding: 4px;
+	opacity: .0001;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	cursor: pointer;
+}
+
+.files-widget-dropbox {
+	width: 698px;
+	min-height: 170px;
+	border: 1px solid transparent;
+	border-top: 1px solid white;
+}
+
+.files-widget-dropbox.dragging-files {
+	background: rgba(0, 0, 0, .05);
+	border: 1px dashed rgba(0, 0, 0, .3);
+}
+
+.files-widget-dropbox .message {
+	display: block;
+	color: #a0a2a4;
+	margin: 30px;
+	text-align: center;
+}
+
+.files-widget-dropbox .preview, .files-widget-dropbox .sortable-placeholder {
+	padding: 5px;
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+	text-align: center;
+}
+
+.files-widget-dropbox .sortable-placeholder {
+	background: rgba(0, 0, 0, .1);
+}
+
+.files-widget .image-holder {
+	display: inline-block;
+	position: relative;
+	border: 3px solid white;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, .8);
+	border-radius: 3px;
+	background: white;
+	text-align: center;
+}
+
+.files-widget-dropbox .image-holder {
+	min-height: 50px;
+	min-width: 50px;
+	line-height: 50px;
+}
+
+.files-widget-dropbox .preview .thumbnail {
+	max-width: 150px;
+	max-height: 150px;
+	vertical-align: middle;
+}
+
+.files-widget-dropbox .preview.new .thumbnail {
+	opacity: .5;
+}
+
+.files-widget-dropbox .preview.new .thumbnail:not([src]) {
+	width: 100px;
+	height: 100px;
+	background: #ddd;
+}
+
+.files-widget-dropbox .buttons {
+	position: absolute;
+	top: -10px;
+	right: -10px;
+	opacity: 0;
+	white-space: nowrap;
+	display: block;
+}
+
+.files-widget-dropbox .preview:hover .buttons {
+	opacity: 1;
+}
+
+.files-widget-dropbox .preview.ui-sortable-helper .buttons,
+		.files-widget-dropbox .preview.new .buttons {
+	display: none;
+}
+
+.files-widget-dropbox .preview:hover .buttons a {
+	margin: -2px;
+}
+
+.files-widget-dropbox .uploaded {
+	position: absolute;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+	background: url('../img/done.png') no-repeat center center rgba(255,255,255,0.5);
+	display: none;
+}
+
+.files-widget-dropbox .preview.done .uploaded {
+	display: block;
+}
+
+.files-widget-dropbox .filename {
+	display: block;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 20px;
+}
+
+.files-widget-dropbox .progress-holder {
+	position: absolute;
+	background-color: #252f38;
+	height: 10px;
+	right: 10px;
+	left: 10px;
+	bottom: 10px;
+	box-shadow: 0 0 2px #000;
+}
+
+.files-widget-dropbox .progress {
+	background-color: #2586d0;
+	position: absolute;
+	height: 100%;
+	left: 0;
+	width: 0;
+	
+	box-shadow: 0 0 1px rgba(255, 255, 255, 0.4) inset;
+	
+	-moz-transition: 0.25s;
+	-webkit-transition: 0.25s;
+	-o-transition: 0.25s;
+	transition: 0.25s;
+}
+
+.files-widget-dropbox .preview.done .progress {
+	width:100% !important;
+}
+
+.files-widget-deleted {
+	
+}
+
+.files-widget-deleted p {
+	color: #bf3030;
+	border-bottom: 1px solid #e0e0e0;
+	padding: 0 5px !important;
+	margin-top: 10px;
+}
+
+.files-widget-deleted .deleted-list {
+	border-top: 1px solid white;
+	padding-top: 5px;
+}
+
+.files-widget-deleted .deleted-file {
+	height: 38px;
+	line-height: 38px;
+	margin-bottom: 5px;
+}
+
+.files-widget-deleted .deleted-file > span {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.files-widget-deleted .deleted-file .image-holder {
+	min-height: 32px;
+	min-width: 32px;
+	line-height: 32px;
+	margin: 0 5px;
+}
+
+.files-widget-deleted .deleted-file .icon {
+	max-height: 32px;
+	max-width: 32px;
+	vertical-align: middle;
+}
+
+.files-widget-deleted .deleted-file .name {
+	white-space: nowrap;
+	text-decoration: line-through;
+	margin: 0 10px;
+}
+
+.files-widget-deleted .deleted-file .undo {
+	font-weight: bold;
+}

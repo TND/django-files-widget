@@ -1,0 +1,16 @@
+*.pyc
+*.pyo
+*.db
+.DS_Store
+.coverage
+local_settings.py
+/static
+bin
+lib
+local
+include
+.Python
+.esp*
+Django*
+/media
+.directory
