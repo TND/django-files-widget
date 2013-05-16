@@ -8,17 +8,18 @@ This is currently a pre-alpha release. Not all functionality is there, only Imag
 Features
 --------
 
-- Drag &amp; drop file uploading via AJAX (using jQuery Filedrop)
+- Drag &amp; drop file uploading via AJAX
 - Uploading multiple files at once
 - Upload progress bar
 - Multiple or single file upload
 - 4 model fields with corresponding form fields and widgets: ImagesField, ImageField, FilesField, and FileField
-- Image gallery widget with drag &amp; drop reordering (using jQueryUI Sortable)
+- Image gallery widget with drag &amp; drop reordering
 
 Quick Start
 -----------
 
 ### Requirements ###
+- Django 1.5 or later
 - (pip install) sorl-thumbnail
 - Unix (file saving uses os.link())
 - (currently) (pip install) mezzanine; we will remove this requirement before our stable release
