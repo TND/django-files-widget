@@ -1,7 +1,7 @@
-django-files-widget (pre-alpha)
+django-files-widget
 ===================
 
-Django model fields and admin widgets for multiple files/images upload
+Django model fields and (admin) form widgets for multiple files/images upload
 
 This is currently a pre-alpha release. Not all functionality is there, only ImagesField has been implemented. There is currently no error handling built in at all.
 
