@@ -3,16 +3,16 @@ django-files-widget (pre-alpha)
 
 Django model fields and admin widgets for multiple files/images upload
 
-This is currently a pre-alpha release. Not all functionality is there. There is currently no error handling built in at all.
+This is currently a pre-alpha release. Not all functionality is there, only ImagesField has been implemented. There is currently no error handling built in at all.
 
 Features
 --------
 
 - Drag &amp; drop file uploading via AJAX (using jQuery Filedrop)
+- Uploading multiple files at once
 - Upload progress bar
 - Multiple or single file upload
 - 4 model fields with corresponding form fields and widgets: ImagesField, ImageField, FilesField, and FileField
-- Uploading multiple files at once
 - Image gallery widget with drag &amp; drop reordering (using jQueryUI Sortable)
 
 Quick Start
@@ -25,6 +25,34 @@ Quick Start
 - jQuery 1.7 or later
 - jQuery UI
 
+### In settings.py ###
+
+    INSTALLED_APPS = (
+        ...,
+        "files_widget",
+        ...,
+    )
+    
+    # basic settings with their defaults
+    FILES_WIDGET_TEMP_DIR = 'temp/files_widget/'        # inside MEDIA_ROOT
+    FILES_WIDGET_FILES_DIR = 'uploads/files_widget/'    # inside MEDIA_ROOT
+    FILES_WIDGET_JQUERY_PATH = ...
+    FILES_WIDGET_JQUERY_UI_PATH = ...
+
+### In urls.py ###
+
+    ("^files-widget/", include("files_widget.urls")),
+
+### In models.py ###
+
+    from files_widget import ImagesField
+  
+    class MyModel(models.Model):
+        images = ImagesField()
+
+### User permissions ###
+
+    files_widget.can_upload_files
 
 Credits
 -------
