@@ -50,7 +50,7 @@ Quick Start
     class MyModel(models.Model):
         images = ImagesField()
 
-### User permissions ###
+### Django Auth user permissions ###
 
     files_widget.can_upload_files
 
