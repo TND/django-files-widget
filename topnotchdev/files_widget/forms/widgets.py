@@ -29,6 +29,7 @@ class ImagesWidget(forms.MultiWidget):
     def render(self, name, value, attrs=None):
         if not isinstance(value, list):
             value = self.decompress(value)
+        
         context = {
             'MEDIA_URL': settings.MEDIA_URL,
             'STATIC_URL': settings.STATIC_URL,

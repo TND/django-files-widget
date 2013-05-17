@@ -11,10 +11,42 @@ from django.template.defaultfilters import slugify
 from config import *
 
 
-def make_temp_dir(filename, user):
+def filename_from_path(path):
+    return re.sub(r'^.+/', '', path)
+
+def construct_temp_path(user):
     now = time.localtime()[0:5]
     dir_name = TEMP_DIR_FORMAT % now
-    public_dir = '%s%s/%i/' % (TEMP_DIR, dir_name, user.pk)
+    return '%s%s/%i/' % (TEMP_DIR, dir_name, user.pk)
+
+def construct_permanent_path(instance):
+    model_dir = slugify(type(instance)._meta.verbose_name_plural)
+    return '%s%s/%i/' % (FILES_DIR, model_dir, instance.pk)
+
+def in_temp_directory(path):
+    # don't try to manipulate with ../../
+    full_path = '%s%s' % (MEDIA_ROOT, path)
+    print os.path.realpath(full_path)
+    return path.startswith(TEMP_DIR) and full_path == os.path.realpath(full_path)
+
+def in_permanent_directory(path, instance):
+    full_path = '%s%s' % (MEDIA_ROOT, path)
+    return path.startswith(construct_permanent_path(instance)) and full_path == os.path.realpath(full_path)
+
+def make_temp_directory(filename, user):
+    public_dir = construct_temp_path(user)
+    full_dir = '%s%s' % (settings.MEDIA_ROOT, public_dir)
+
+    if not os.path.exists(full_dir):
+        os.makedirs(full_dir)
+
+    full_path = '%s%s' % (full_dir, filename)
+    available_full_path = default_storage.get_available_name(full_path)
+    return available_full_path
+
+def make_permanent_directory(temp_path, instance):
+    public_dir = construct_permanent_path(instance)
+    filename = filename_from_path(temp_path)
     full_dir = '%s%s' % (settings.MEDIA_ROOT, public_dir)
 
     if not os.path.exists(full_dir):
@@ -32,8 +64,8 @@ def save_upload(uploaded, filename, raw_data, user):
     submission and is a regular Django UploadedFile in request.FILES
     '''
 
-    path = make_temp_dir(filename, user)
-    public_path = path.replace(settings.MEDIA_ROOT, '')
+    path = make_temp_directory(filename, user)
+    public_path = path.replace(settings.MEDIA_ROOT, '', 1)
 
     #try:
     with BufferedWriter(FileIO(path, "wb")) as dest:
@@ -55,35 +87,38 @@ def save_upload(uploaded, filename, raw_data, user):
     #    pass
     return False
 
-
-def make_permanent_dir(temp_path, obj):
-    model_dir = slugify(type(obj)._meta.verbose_name_plural)
-    public_dir = '%s%s/%i/' % (FILES_DIR, model_dir, obj.pk)
-    filename = re.sub(r'^.+/', '', temp_path)
-    full_dir = '%s%s' % (settings.MEDIA_ROOT, public_dir)
-
-    if not os.path.exists(full_dir):
-        os.makedirs(full_dir)
-
-    full_path = '%s%s' % (full_dir, filename)
-    available_full_path = default_storage.get_available_name(full_path)
-    return available_full_path
-
-def move_to_permanent_dir(temp_path, obj):
-    if temp_path.startswith('/') or temp_path.find('//') != -1:
+def try_to_recover_path(temp_path, instance):
+    filename = filename_from_path(temp_path)
+    permanent_directory = construct_permanent_path(instance)
+    permanent_path = '%s%s' % (permanent_directory, filename)
+    full_path = '%s%s' % (settings.MEDIA_ROOT, permanent_path)
+    if os.path.exists(full_path):
+        return permanent_path, True
+    else:
         return temp_path, False
 
-    full_path = make_permanent_dir(temp_path, obj)
-    public_path = full_path.replace(settings.MEDIA_ROOT, '')
-    full_temp_path = '%s%s' % (settings.MEDIA_ROOT, temp_path)
-    os.link(full_temp_path, full_path)
+def move_to_permanent_directory(temp_path, instance):
+    if temp_path.startswith('/') or temp_path.find('//') != -1 \
+            or in_permanent_directory(temp_path, instance):
+        return temp_path, False
 
-    if temp_path.startswith(TEMP_DIR):
-        os.remove(full_temp_path)
+    full_path = make_permanent_directory(temp_path, instance)
+    public_path = full_path.replace(settings.MEDIA_ROOT, '', 1)
+    full_temp_path = '%s%s' % (settings.MEDIA_ROOT, temp_path)
+    try:
+        os.link(full_temp_path, full_path)
+    except EnvironmentError:
+        return try_to_recover_path(temp_path, instance)
+
+    if in_temp_directory(temp_path):
+        try:
+            os.remove(full_temp_path)
+        except EnvironmentError:
+            return try_to_recover_path(temp_path, instance)
 
     return public_path, True
 
-def move_images_to_permanent_dir(sender, instance, **kwargs):
+def manage_files_on_disk(sender, instance, **kwargs):
     # Receiver of Django post_save signal.
     # At this point we know that the model instance has been saved into the db.
     from fields import ImagesField
@@ -98,24 +133,55 @@ def move_images_to_permanent_dir(sender, instance, **kwargs):
         old_images = (getattr(instance, old_value_attr) or '').splitlines()
         deleted_images = (getattr(instance, deleted_value_attr) or '').splitlines()
         current_images = (getattr(instance, field.name) or '').splitlines()
+        new_images = []
         changed = False
 
         # Delete removed images from disk if they are in our FILES_DIR.
-        for img in old_images:
-            if img not in current_images and img.startswith(FILES_DIR):
-                os.remove('%s%s' % (settings.MEDIA_ROOT, img))
-                changed = True
+        # we implement redundant checks to be absolutely sure that
+        # files must be deleted. For example, if a JS error leads to
+        # incorrect file lists in the hidden inputs, we reconstruct the old value.
+        #
+        # O = old_images, C = current_images, D = deleted_images
+        #
+        # what do we do with files that appear in:
+        #
+        #   ---  (OK)    do nothing, we don't even know it's name :)
+        #   --D  (OK)    if in temp dir or permanent dir of inst: delete from disk
+        #   -C-  (OK)    if not in permanent dir of inst, create hard link if possible;
+        #                if in temp dir, delete
+        #   -CD  (ERROR) show warning message after save
+        #   O--  (ERROR) put back in current, show warning message after save
+        #   O-D  (OK)    if in temp dir or permanent dir of inst: delete from disk
+        #   OC-  (OK)    if not in permanent dir of inst, create hard link if possible;
+        #                if in temp dir, delete
+        #   OCD  (ERROR) show warning message after save
 
-        # hard link images in FILES_DIR if possible and remove them from TEMP_DIR.
-        new_images = []
         for img in current_images:
-            path, path_changed = move_to_permanent_dir(img, instance)
-            new_images.append(path)
-            if path_changed:
-                changed = True
+            # OC-, -C-, OCD & -CD
+            new_path = img
+            if not in_permanent_directory(img, instance):
+                new_path, path_changed = move_to_permanent_directory(img, instance)
+                if path_changed:
+                    changed = True
+            new_images.append(new_path)
 
+        for img in deleted_images:
+            if img not in current_images:
+                # --D & O-D
+                if in_permanent_directory(img, instance) or in_temp_directory(img):
+                    try:
+                        os.remove('%s%s' % (settings.MEDIA_ROOT, img))
+                    except EnvironmentError as e:
+                        raise e
+
+        for img in old_images:
+            if img not in current_images and img not in deleted_images:
+                # O--
+                changed = True
+                new_images.append(img)
+
+        delattr(instance, old_value_attr)
+        delattr(instance, deleted_value_attr)
         if changed:
             setattr(instance, field.name, '\n'.join(new_images))
-            delattr(instance, old_value_attr)
-            delattr(instance, deleted_value_attr)
             instance.save()

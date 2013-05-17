@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from forms import ImagesFormField, ImagesWidget
-from util import move_images_to_permanent_dir
+from util import manage_files_on_disk
 from config import *
 
 
@@ -16,7 +16,7 @@ class ImagesField(models.TextField):
     description = _("Images")
 
     def contribute_to_class(self, cls, name):
-        receiver(post_save, sender=cls)(move_images_to_permanent_dir)
+        receiver(post_save, sender=cls)(manage_files_on_disk)
         super(ImagesField, self).contribute_to_class(cls, name)
 
     def formfield(self, form_class=ImagesFormField, **kwargs):
@@ -31,7 +31,7 @@ class ImagesField(models.TextField):
         # We don't know yet if the form will really be saved.
         old_data = getattr(instance, self.name)
         setattr(instance, OLD_VALUE_STR % self.name, old_data)
-        setattr(instance, DELETED_VALUE_STR % self.name, old_data)
+        setattr(instance, DELETED_VALUE_STR % self.name, data.deleted_files)
         super(ImagesField, self).save_form_data(instance, data)
 
 
