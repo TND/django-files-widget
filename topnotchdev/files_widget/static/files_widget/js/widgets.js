@@ -6,10 +6,14 @@ $(function(){
         mediaURL = $('[data-media-url]').data('media-url'),
         staticURL = $('[data-static-url]').data('static-url');
 
+    function splitlines(str) {
+        return str.match(/[^\r\n]+/g) || [];
+    }
+
     function fillIn(input, files) {
         var value = '';
         files.each(function() {
-            var path = $(this).attr('data-image-path');
+            var path = $(this).data('image-path');
             if (path) {
                 value += path + '\n';
             }
@@ -17,13 +21,34 @@ $(function(){
         input.val(value);
     }
 
-    function fillInHiddenInput(input, deletedInput) {
-        var widget = input.closest('.files-widget'),
+    function fillInHiddenInputs(inputName, movedOutFile, movedInFile) {
+        var input = $('input[name="' + inputName + '_0"]'),
+            deletedInput = $('input[name="' + inputName + '_1"]'),
+            movedInput = $('input[name="' + inputName + '_2"]'),
+            widget = input.closest('.files-widget'),
             files = widget.find('.preview'),
             deletedFiles = widget.find('.deleted-file');
 
-        fillIn(input, files);
+        fillIn(input, files.add(movedInFile));
         fillIn(deletedInput, deletedFiles);
+
+        if (movedOutFile) {
+            var movedInputValue = splitlines(movedInput.val()),
+                filename = movedOutFile.data('image-path');
+            console.log(movedOutFile);
+            movedInputValue.push(filename);
+            movedInput.val(movedInputValue.join('\n'));
+        }
+        if (movedInFile) {
+            var movedInputValue = splitlines(movedInput.val()),
+                filename = movedInFile.data('image-path'),
+                index = movedInputValue.indexOf(filename);
+
+            if (index != -1) {
+                movedInputValue.splice(index, 1);
+                movedInput.val(movedInputValue);
+            }
+        }
     }
 
     function filenameFromPath(path) {
@@ -69,7 +94,7 @@ $(function(){
                 if (!dropbox.find('.preview').length) {
                     message.show();
                 };
-                fillInHiddenInput(hiddenInput, deletedInput);
+                fillInHiddenInputs(inputName);
             });
         });
 
@@ -89,7 +114,7 @@ $(function(){
                 if (!deletedList.find('.deleted-file').length) {
                     deletedContainer.hide();
                 };
-                fillInHiddenInput(hiddenInput, deletedInput);
+                fillInHiddenInputs(inputName);
             });
         });
 
@@ -110,7 +135,7 @@ $(function(){
             message.hide();
             fileBrowserResultInput.val('');
             preview.appendTo(dropbox);
-            fillInHiddenInput(hiddenInput, deletedInput);
+            fillInHiddenInputs(inputName);
         }
 
         function checkFileBrowserResult() {
@@ -135,15 +160,21 @@ $(function(){
         dropbox.disableSelection();
 
         dropbox.sortable({
-            'beforeStop': function(e, ui) {
-                fillInHiddenInput(hiddenInput, deletedInput);
-            },
-            'start': function(e, ui) {
-                console.log(ui.item);
+            start: function(e, ui) {
                 $('.sortable-placeholder').width(ui.item.width()).height(ui.item.height());
             },
-            'placeholder': 'sortable-placeholder',
-            'tolerance': 'pointer'
+            beforeStop: function(e, ui) {
+                var newInputName = ui.placeholder.parent().data('input-name');
+                if (newInputName == inputName) {
+                    fillInHiddenInputs(inputName);
+                } else {
+                    fillInHiddenInputs(inputName, ui.item, null);
+                    fillInHiddenInputs(newInputName, null, ui.item);
+                }
+            },
+            placeholder: 'sortable-placeholder',
+            tolerance: 'pointer',
+            connectWith: '.files-widget-dropbox',
         });
         
         dropbox.filedrop({
@@ -169,7 +200,7 @@ $(function(){
                 // response is the JSON object that post_file.php returns
                 $.data(file).attr('data-image-path', response.imagePath);
                 $.data(file).find('.thumbnail').attr('src', response.thumbnailPath);
-                fillInHiddenInput(hiddenInput, deletedInput);
+                fillInHiddenInputs(inputName);
             },
             
             error: function(err, file) {

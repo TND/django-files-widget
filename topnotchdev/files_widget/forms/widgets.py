@@ -23,19 +23,19 @@ class ImagesWidget(forms.MultiWidget):
 
     def decompress(self, value):
         if value:
-            return [value, '', ]
-        return ['', '', ]
+            return [value, '', '', ]
+        return ['', '', '', ]
 
     def render(self, name, value, attrs=None):
         if not isinstance(value, list):
-            value = self.decompress(value)
+            files, deleted_files, moved_files = self.decompress(value)
 
         context = {
             'MEDIA_URL': settings.MEDIA_URL,
             'STATIC_URL': settings.STATIC_URL,
             'input_string': super(ImagesWidget, self).render(name, value, attrs),
             'name': name,
-            'files': value[0],
-            'deleted_files': value[1],
+            'files': files,
+            'deleted_files': deleted_files,
         }
         return render_to_string("files_widget/images_widget.html", context)

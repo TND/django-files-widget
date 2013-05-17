@@ -26,7 +26,6 @@ def construct_permanent_path(instance):
 def in_temp_directory(path):
     # don't try to manipulate with ../../
     full_path = '%s%s' % (MEDIA_ROOT, path)
-    print os.path.realpath(full_path)
     return path.startswith(TEMP_DIR) and full_path == os.path.realpath(full_path)
 
 def in_permanent_directory(path, instance):
@@ -127,12 +126,14 @@ def manage_files_on_disk(sender, instance, **kwargs):
     for field in fields:
         old_value_attr = OLD_VALUE_STR % field.name
         deleted_value_attr = DELETED_VALUE_STR % field.name
+        moved_value_attr = MOVED_VALUE_STR % field.name
         if not hasattr(instance, old_value_attr):
             continue
 
         old_images = (getattr(instance, old_value_attr) or '').splitlines()
-        deleted_images = (getattr(instance, deleted_value_attr) or '').splitlines()
         current_images = (getattr(instance, field.name) or '').splitlines()
+        deleted_images = (getattr(instance, deleted_value_attr) or '').splitlines()
+        moved_images = (getattr(instance, moved_value_attr) or '').splitlines()
         new_images = []
         changed = False
 
@@ -172,16 +173,17 @@ def manage_files_on_disk(sender, instance, **kwargs):
                     try:
                         os.remove('%s%s' % (settings.MEDIA_ROOT, img))
                     except EnvironmentError as e:
-                        raise e
+                        pass
 
         for img in old_images:
-            if img not in current_images and img not in deleted_images:
+            if img not in current_images and img not in deleted_images and img not in moved_images:
                 # O--
                 changed = True
                 new_images.append(img)
 
         delattr(instance, old_value_attr)
         delattr(instance, deleted_value_attr)
+        delattr(instance, moved_value_attr)
         if changed:
             setattr(instance, field.name, '\n'.join(new_images))
             instance.save()

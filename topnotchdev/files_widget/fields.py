@@ -22,8 +22,8 @@ class ImagesField(models.TextField):
     def formfield(self, form_class=ImagesFormField, **kwargs):
         return super(ImagesField, self).formfield(
             form_class=form_class,
-            fields=(forms.CharField(), forms.CharField(), ),
-            widget=ImagesWidget(widgets=(forms.HiddenInput, forms.HiddenInput, )),
+            fields=(forms.CharField(), forms.CharField(), forms.CharField(), ),
+            widget=ImagesWidget(widgets=(forms.HiddenInput, forms.HiddenInput, forms.HiddenInput, )),
         )
 
     def save_form_data(self, instance, data):
@@ -32,6 +32,7 @@ class ImagesField(models.TextField):
         old_data = getattr(instance, self.name)
         setattr(instance, OLD_VALUE_STR % self.name, old_data)
         setattr(instance, DELETED_VALUE_STR % self.name, data.deleted_files)
+        setattr(instance, MOVED_VALUE_STR % self.name, data.moved_files)
         super(ImagesField, self).save_form_data(instance, data)
 
 
