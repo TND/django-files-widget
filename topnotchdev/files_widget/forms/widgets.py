@@ -17,7 +17,7 @@ class ImagesWidget(forms.MultiWidget):
         )
         css = {
             'all': (
-                '%sfiles_widget/css/widgets.css' % settings.STATIC_URL,
+                'files_widget/css/widgets.css',
             ),
         }
 
@@ -29,7 +29,7 @@ class ImagesWidget(forms.MultiWidget):
     def render(self, name, value, attrs=None):
         if not isinstance(value, list):
             value = self.decompress(value)
-        
+
         context = {
             'MEDIA_URL': settings.MEDIA_URL,
             'STATIC_URL': settings.STATIC_URL,
