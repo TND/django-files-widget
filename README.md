@@ -39,7 +39,7 @@ or, for an editable copy in your `src` directory:
 
     INSTALLED_APPS = (
         ...,
-        "files_widget",
+        "topnotchdev.files_widget",
         ...,
     )
     
@@ -51,7 +51,7 @@ or, for an editable copy in your `src` directory:
 
 ### In `urls.py` ###
 
-    ("^files-widget/", include("files_widget.urls")),
+    ("^files-widget/", include("topnotchdev.files_widget.urls")),
 
 ### In `models.py` ###
 
