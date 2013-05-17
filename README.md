@@ -33,7 +33,7 @@ Quick Start
 
 or, for an editable copy in your `src` directory:
 
-    pip install -e git+git@github.com:TND/django-files-widget.git#egg=topnotchdev.files_widget
+    pip install -e git+git@github.com:TND/django-files-widget.git#egg=django-files-widget
 
 ### In `settings.py` ###
 
