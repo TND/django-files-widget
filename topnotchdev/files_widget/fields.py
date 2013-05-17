@@ -37,6 +37,6 @@ class ImagesField(models.TextField):
 
 try:
     from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ["^files_widget\.fields\.ImagesField"])
+    add_introspection_rules([], ["^topnotchdev\.files_widget\.fields\.ImagesField"])
 except ImportError:
     pass
