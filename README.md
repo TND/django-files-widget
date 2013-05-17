@@ -14,6 +14,7 @@ Features
 - Multiple or single file upload
 - 4 model fields with corresponding form fields and widgets: ImagesField, ImageField, FilesField, and FileField
 - Image gallery widget with drag &amp; drop reordering
+- File list widget with file type icons and metadata
 
 Quick Start
 -----------

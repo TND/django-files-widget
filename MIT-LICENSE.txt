@@ -1,4 +1,4 @@
-Copyright (C) 2013 Top Notch Development
+Copyright (C) 2013 Top Notch Development and individual contributors.
 http://www.topnotchdevelopment.nl/
 maarten@topnotchdevelopment.nl
 
