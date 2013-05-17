@@ -1,9 +1,9 @@
-django-files-widget (pre-alpha)
+django-files-widget
 ===================
 
-Django model fields and admin widgets for multiple files/images upload
+Django model fields and (admin) form widgets for multiple files/images upload
 
-This is currently a pre-alpha release. Not all functionality is there, only ImagesField has been implemented. There is currently no error handling built in at all.
+__This is currently a pre-alpha release. Not all functionality is there, only `ImagesField` has been implemented. There is currently no error handling built in at all.__
 
 Features
 --------
@@ -12,7 +12,7 @@ Features
 - Uploading multiple files at once
 - Upload progress bar
 - Multiple or single file upload
-- 4 model fields with corresponding form fields and widgets: ImagesField, ImageField, FilesField, and FileField
+- Four model fields with corresponding form fields and widgets: `ImagesField`, `ImageField`, `FilesField`, and `FileField`
 - Image gallery widget with drag &amp; drop reordering
 - File list widget with file type icons and metadata
 
@@ -22,12 +22,12 @@ Quick Start
 ### Requirements ###
 - Django 1.5 or later
 - (pip install) sorl-thumbnail
-- Unix (file saving uses os.link())
+- Unix (file saving uses `os.link()`)
 - (currently) (pip install) mezzanine; we will remove this requirement before our stable release
 - jQuery 1.7 or later
 - jQuery UI
 
-### In settings.py ###
+### In `settings.py` ###
 
     INSTALLED_APPS = (
         ...,
@@ -41,11 +41,11 @@ Quick Start
     FILES_WIDGET_JQUERY_PATH = ...
     FILES_WIDGET_JQUERY_UI_PATH = ...
 
-### In urls.py ###
+### In `urls.py` ###
 
     ("^files-widget/", include("files_widget.urls")),
 
-### In models.py ###
+### In `models.py` ###
 
     from files_widget import ImagesField
   
