@@ -7,9 +7,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from files_widget.forms import ImagesFormField, ImagesWidget
-from files_widget.util import move_images_to_permanent_dir
-from files_widget.config import *
+from forms import ImagesFormField, ImagesWidget
+from util import move_images_to_permanent_dir
+from config import *
 
 
 class ImagesField(models.TextField):

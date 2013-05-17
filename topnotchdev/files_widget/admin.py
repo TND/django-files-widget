@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from files_widget.config import *
+from config import *
 
 # currently not used
 class MyModelAdmin(admin.ModelAdmin):
