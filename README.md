@@ -27,6 +27,14 @@ Quick Start
 - jQuery 1.7 or later
 - jQuery UI
 
+### Install ###
+
+    pip install git+git://github.com:TND/django-files-widget.git
+
+or, for an editable copy in your `src` directory:
+
+    pip install -e git+git@github.com:TND/django-files-widget.git#egg=django-files-widget
+
 ### In `settings.py` ###
 
     INSTALLED_APPS = (
