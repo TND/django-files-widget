@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import permission_required
 
-from files_widget.util import save_upload
+from util import save_upload
 
 
 @permission_required('files_widget.can_upload_files')
