@@ -1,1 +1,1 @@
-{% load thumbnail files_widget_tags %}{% thumbnail path_to_file '150x150' upscale=False format=path_to_file|thumbnail_format as thumb %}{{ thumb.url }}{% endthumbnail %}
+{% load thumbnail files_widget_tags %}{% thumbnail path_to_file|unquote '150x150' upscale=False format=path_to_file|thumbnail_format as thumb %}{{ thumb.url }}{% endthumbnail %}
