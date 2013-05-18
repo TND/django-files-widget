@@ -1,4 +1,6 @@
 import re
+import urllib
+
 from django import template
 
 
@@ -16,3 +18,8 @@ def thumbnail_format(filename):
 @register.filter
 def filename_from_path(path):
     return re.sub(r'^.+\/', '', path)
+
+@register.filter
+def unquote(value):
+    "urldecode"
+    return urllib.unquote(value)
