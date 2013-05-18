@@ -2,52 +2,11 @@
 	display: inline-block;
 }
 
-.files-widget .controls {
-	padding-bottom: 8px;
-	border-bottom: 1px solid #e0e0e0;
-}
-
-.files-widget .controls .fake-files-input {
-	margin-top: 0;
-	margin-bottom: 0;
-	padding: 4px 8px 3px;
-	width: auto;
-	color: #fff;
-	border: none;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	background: #acd7e5;
-	cursor: pointer;
-	background: -webkit-gradient(linear, left top, left bottom, from(#acd7e5), to(#a4cedb));
-	margin-left: 2px;
-	position: relative;
-	display: inline-block;
-	vertical-align: middle;
-	font-weight: bold;
-	overflow: hidden;
-}
-
-.files-widget .controls .fake-files-input:hover {
-    background: #444;
-}
-
-.files-widget .controls .files-input {
-	padding: 4px;
-	opacity: .0001;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	cursor: pointer;
-}
-
 .files-widget-dropbox {
 	width: 698px;
-	min-height: 170px;
+	min-height: 100px;
 	border: 1px solid transparent;
-	border-top: 1px solid white;
+	margin: 0 -3px;
 }
 
 .files-widget-dropbox.dragging-files {
@@ -166,9 +125,7 @@
 	height: 100%;
 	left: 0;
 	width: 0;
-	
 	box-shadow: 0 0 1px rgba(255, 255, 255, 0.4) inset;
-	
 	-moz-transition: 0.25s;
 	-webkit-transition: 0.25s;
 	-o-transition: 0.25s;
@@ -179,6 +136,47 @@
 	width:100% !important;
 }
 
+.files-widget .controls {
+	padding: 8px 0 0;
+	text-align: left;
+}
+
+.files-widget .controls .fake-files-input {
+	margin-top: 0;
+	margin-bottom: 0;
+	padding: 4px 8px 3px;
+	width: auto;
+	color: #fff;
+	border: none;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background: #acd7e5;
+	cursor: pointer;
+	background: -webkit-gradient(linear, left top, left bottom, from(#acd7e5), to(#a4cedb));
+	margin-left: 2px;
+	position: relative;
+	display: inline-block;
+	vertical-align: middle;
+	font-weight: bold;
+	overflow: hidden;
+}
+
+.files-widget .controls .fake-files-input:hover {
+    background: #444;
+}
+
+.files-widget .controls .files-input {
+	padding: 4px;
+	opacity: .0001;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	cursor: pointer;
+}
+
 .files-widget-deleted {
 	
 }
@@ -186,7 +184,7 @@
 .files-widget-deleted p {
 	color: #bf3030;
 	border-bottom: 1px solid #e0e0e0;
-	padding: 0 5px !important;
+	padding: 0 1px !important;
 	margin-top: 10px;
 }
 
@@ -210,7 +208,7 @@
 	min-height: 32px;
 	min-width: 32px;
 	line-height: 32px;
-	margin: 0 5px;
+	margin: 0 5px 0 3px;
 }
 
 .files-widget-deleted .deleted-file .icon {

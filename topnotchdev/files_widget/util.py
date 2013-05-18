@@ -23,10 +23,10 @@ def construct_permanent_path(instance):
     model_dir = slugify(type(instance)._meta.verbose_name_plural)
     return '%s%s/%i/' % (FILES_DIR, model_dir, instance.pk)
 
-def in_temp_directory(path):
+def in_directory(path, directory):
     # don't try to manipulate with ../../
     full_path = '%s%s' % (MEDIA_ROOT, path)
-    return path.startswith(TEMP_DIR) and full_path == os.path.realpath(full_path)
+    return path.startswith(directory) and full_path == os.path.realpath(full_path)
 
 def in_permanent_directory(path, instance):
     full_path = '%s%s' % (MEDIA_ROOT, path)
@@ -109,7 +109,7 @@ def move_to_permanent_directory(temp_path, instance):
     except EnvironmentError:
         return try_to_recover_path(temp_path, instance)
 
-    if in_temp_directory(temp_path):
+    if in_directory(temp_path, TEMP_DIR):
         try:
             os.remove(full_temp_path)
         except EnvironmentError:
@@ -160,7 +160,7 @@ def manage_files_on_disk(sender, instance, **kwargs):
         for img in current_images:
             # OC-, -C-, OCD & -CD
             new_path = img
-            if not in_permanent_directory(img, instance):
+            if in_directory(img, TEMP_DIR) or in_directory(img, FILES_DIR):
                 new_path, path_changed = move_to_permanent_directory(img, instance)
                 if path_changed:
                     changed = True
@@ -169,7 +169,7 @@ def manage_files_on_disk(sender, instance, **kwargs):
         for img in deleted_images:
             if img not in current_images:
                 # --D & O-D
-                if in_permanent_directory(img, instance) or in_temp_directory(img):
+                if in_permanent_directory(img, instance) or in_directory(img, TEMP_DIR):
                     try:
                         os.remove('%s%s' % (settings.MEDIA_ROOT, img))
                     except EnvironmentError as e:

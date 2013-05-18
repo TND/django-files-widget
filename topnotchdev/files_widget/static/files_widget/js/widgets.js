@@ -170,7 +170,13 @@ $(function(){
                 } else {
                     fillInHiddenInputs(inputName, ui.item, null);
                     fillInHiddenInputs(newInputName, null, ui.item);
+                    if (!dropbox.find('.preview').length) {
+                        message.show();
+                    }
                 }
+            },
+            over: function() {
+                message.hide();
             },
             placeholder: 'sortable-placeholder',
             tolerance: 'pointer',
