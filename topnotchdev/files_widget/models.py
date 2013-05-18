@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Group, Permission
 
+
 class GlobalPermissionManager(models.Manager):
     def get_query_set(self):
         return super(GlobalPermissionManager, self).\

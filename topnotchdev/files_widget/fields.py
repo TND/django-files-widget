@@ -8,8 +8,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from forms import ImagesFormField, ImagesWidget
-from util import manage_files_on_disk
-from config import *
+from files import manage_files_on_disk
+from conf import *
 
 
 class ImagesField(models.TextField):

@@ -8,7 +8,7 @@ from django.core.files.storage import default_storage
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
 
-from config import *
+from conf import *
 
 
 def filename_from_path(path):

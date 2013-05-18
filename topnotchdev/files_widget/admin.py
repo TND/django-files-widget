@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from config import *
+from conf import *
 
 # currently not used
 class MyModelAdmin(admin.ModelAdmin):
