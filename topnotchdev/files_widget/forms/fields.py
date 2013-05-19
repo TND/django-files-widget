@@ -2,7 +2,7 @@ from django import forms
 from django.core import exceptions, validators
 from django.utils.translation import ugettext_lazy as _
 
-from topnotchdev.files_widget.config import *
+from topnotchdev.files_widget.conf import *
 from widgets import ImagesWidget
 
 

@@ -3,7 +3,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
-from topnotchdev.files_widget.config import *
+from topnotchdev.files_widget.conf import *
 
 
 class ImagesWidget(forms.MultiWidget):
