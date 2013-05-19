@@ -4,11 +4,104 @@ $(function(){
         widget = $('.files-widget'),
         effectTime = 200,
         mediaURL = $('[data-media-url]').data('media-url'),
-        staticURL = $('[data-static-url]').data('static-url');
+        staticURL = $('[data-static-url]').data('static-url'),
+        template,
+        deletedTemplate;
+
+    template =
+        '<div class="new preview">'+
+            '<span class="image-holder">'+
+                '<img class="thumbnail" />'+
+                '<span class="buttons">'+
+                    '<a href="javascript:void(0)" class="enlarge-button">'+
+                        '<img src="'+ staticURL + 'files_widget/img/enlarge_button.png" />'+
+                    '</a> '+
+                    '<a href="javascript:void(0)" class="remove-button">'+
+                        '<img src="'+ staticURL + 'files_widget/img/close_button.png" />'+
+                    '</a>'+
+                '</span>'+
+            '</span>'+
+            '<div class="progress-holder">'+
+                '<div class="progress"></div>'+
+            '</div>'+
+        '</div>';
+
+    deletedTemplate =
+        '<div class="deleted-file">'+
+            '<span class="image-holder">'+
+                '<img class="icon" />'+
+            '</span>'+
+            '<span class="name"></span>'+
+            '<span class="undo">'+
+                '<a href="javascript:void(0);" class="undo-remove-button">'+
+                    'Undo'+
+                '</a>'+
+            '</span>'+
+        '</div>';
 
     function splitlines(str) {
         return str.match(/[^\r\n]+/g) || [];
     }
+
+    function filenameFromPath(path) {
+        return path.replace(/^.+\//);
+    }
+
+    function stripMediaURL(path) {
+        if (path.indexOf(mediaURL) === 0) {
+            return path.replace(mediaURL, '');
+        }
+        return path;
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function numberformat( number, decimals, dec_point, thousands_sep ) {
+        // http://kevin.vanzonneveld.net
+        // +   original by: Jonas Raoni Soares Silva (http://www.jsfromhell.com)
+        // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+        // *     example 1: number_format(1234.5678, 2, '.', '');
+        // *     returns 1: 1234.57     
+     
+        var n = number, c = isNaN(decimals = Math.abs(decimals)) ? 2 : decimals;
+        var d = dec_point == undefined ? "," : dec_point;
+        var t = thousands_sep == undefined ? "." : thousands_sep, s = n < 0 ? "-" : "";
+        var i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "", j = (j = i.length) > 3 ? j % 3 : 0;
+        
+        return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+    }
+
+    function sizeformat(filesize) {
+        // from http://snipplr.com/view/5945/javascript-numberformat--ported-from-php/
+        if (filesize >= 1073741824) {
+             filesize = numberformat(filesize / 1073741824, 2, '.', '') + ' GB';
+        } else { 
+            if (filesize >= 1048576) {
+                filesize = numberformat(filesize / 1048576, 2, '.', '') + ' MB';
+        } else { 
+                if (filesize >= 1024) {
+                filesize = numberformat(filesize / 1024, 0) + ' KB';
+            } else {
+                filesize = numberformat(filesize, 0) + 'B';
+                };
+            };
+        };
+        return filesize;
+    };
 
     function fillIn(input, files) {
         var value = '';
@@ -35,7 +128,7 @@ $(function(){
         if (movedOutFile) {
             var movedInputValue = splitlines(movedInput.val()),
                 filename = movedOutFile.data('image-path');
-            console.log(movedOutFile);
+            //console.log(movedOutFile);
             movedInputValue.push(filename);
             movedInput.val(movedInputValue.join('\n'));
         }
@@ -51,9 +144,15 @@ $(function(){
         }
     }
 
-    function filenameFromPath(path) {
-        return path.replace(/^.+\//);
-    }
+    $(document).bind('dragover', function (e) {
+        e.preventDefault();
+        $('.files-widget-dropbox').addClass('dragging-files');
+    }).bind('drop', function (e) {
+        e.preventDefault();
+        $('.files-widget-dropbox').removeClass('dragging-files');
+    }).bind('dragleave', function (e) {
+        $('.files-widget-dropbox').removeClass('dragging-files');
+    });
 
     widget.each(function() {
         var that = $(this),
@@ -68,12 +167,12 @@ $(function(){
             initialFiles = $('.preview', dropbox),
             fileBrowserResultInput = $('.filebrowser-result', that),
             deletedContainer = $('.files-widget-deleted', that),
-            deletedList = $('.deleted-list', deletedContainer);
+            deletedList = $('.deleted-list', deletedContainer),
+            stats = $('.upload-progress-stats', that);
 
         if (initialFiles.length) {
             message.hide();
         }
-
         if (deletedList.find('.deleted-file').length) {
             deletedContainer.show();
         }
@@ -108,7 +207,7 @@ $(function(){
             preview.removeClass('new');
             preview.attr('data-image-path', imagePath).find('.progress-holder').remove();
             message.hide();
-            preview.hide().appendTo(dropbox).fadeIn(effectTime);
+            preview.hide().insertAfter(dropbox.children(':last-child')).fadeIn(effectTime);
             deletedPreview.slideUp(effectTime, function() {
                 $(this).remove();
                 if (!deletedList.find('.deleted-file').length) {
@@ -125,7 +224,7 @@ $(function(){
         function onFileBrowserResult() {
             var preview = $(template), 
                 image = $('.thumbnail', preview),
-                imagePath = fileBrowserResultInput.val();
+                imagePath = stripMediaURL(fileBrowserResultInput.val());
 
             $.get(dropbox.data('get-thumbnail-url'), 'img=' + imagePath, function(data) {
                 image.attr('src', data);
@@ -134,7 +233,7 @@ $(function(){
             preview.attr('data-image-path', imagePath).find('.progress-holder').remove();
             message.hide();
             fileBrowserResultInput.val('');
-            preview.appendTo(dropbox);
+            preview.insertAfter(dropbox.children(':last-child'));
             fillInHiddenInputs(inputName);
         }
 
@@ -145,8 +244,8 @@ $(function(){
             checkInterval = setInterval(function() {
                 var newVal = fileBrowserResultInput.val();
                 if (oldVal != newVal) {
-                    onFileBrowserResult();
                     clearInterval(checkInterval);
+                    onFileBrowserResult();
                 }
             }, 250);
         }
@@ -157,12 +256,19 @@ $(function(){
             checkFileBrowserResult();
         });
 
-        dropbox.disableSelection();
-
         dropbox.sortable({
+            placeholder: 'sortable-placeholder',
+            tolerance: 'pointer',
+            connectWith: '.files-widget-dropbox',
+
             start: function(e, ui) {
                 $('.sortable-placeholder').width(ui.item.width()).height(ui.item.height());
             },
+
+            over: function() {
+                message.hide();
+            },
+
             beforeStop: function(e, ui) {
                 var newInputName = ui.placeholder.parent().data('input-name');
                 if (newInputName == inputName) {
@@ -174,166 +280,98 @@ $(function(){
                         message.show();
                     }
                 }
-            },
-            over: function() {
-                message.hide();
-            },
-            placeholder: 'sortable-placeholder',
-            tolerance: 'pointer',
-            connectWith: '.files-widget-dropbox',
+            }
         });
-        
-        dropbox.filedrop({
-            // The name of the $_FILES entry:
-            paramname: 'file',
-            fallback_id: fallback_id,
-            queuefiles: 2,
-            maxfilesize: 10,
-            url: uploadURL,
 
-            headers: {
-                'X-CSRFToken': csrfToken
+        dropbox.disableSelection();
+        dropbox.bind('dragover', function (e) {
+            dropbox.addClass('dragover');
+        }).bind('dragleave drop', function (e) {
+            dropbox.removeClass('dragover');
+        });
+
+        filesInput.fileupload({
+            url: uploadURL,
+            type: 'POST',
+            dataType: 'json',
+            dropZone: dropbox,
+            pasteZone: dropbox,
+            paramName: 'files[]',
+            limitConcurrentUploads: 3,
+            formData: [
+                {
+                    name: 'csrf_token',
+                    value: csrfToken
+                },
+            ],
+            autoUpload: true,
+            maxFileSize: 10000000,
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            maxNumberOfFiles: undefined,
+            previewMaxWidth: 150,
+            previewMaxHeight: 150,
+            previewCrop: true,
+
+            add: function(e, data) {
+                var preview = $(template), 
+                    image = $('.thumbnail', preview),
+                    reader = new FileReader(),
+                    file = data.files[0];
+                //console.log('add', data);
+                reader.onload = function(e){
+                    image.attr('src', e.target.result);
+                };
+                
+                if (file.size < 500000) {
+                    reader.readAsDataURL(file);
+                } else {
+                    $('<span/>').addClass('filename').text(file.name)
+                        .appendTo('.image-holder', preview);
+                }
+                
+                message.hide();
+                preview.insertAfter(dropbox.children(':last-child'));
+                data.context = preview;
+                data.submit();
             },
 
-            docEnter: function(e) { dropbox.addClass('dragging-files'); },
-            docLeave: function(e) { dropbox.removeClass('dragging-files'); },
-            docDrop: function(e) { dropbox.removeClass('dragging-files'); },
-            drop: function(e) { dropbox.removeClass('dragging-files'); },
-            afterAll: function(e) { dropbox.removeClass('dragging-files'); },
-            
-            uploadFinished: function(i, file, response) {
-                $.data(file).removeClass('new').find('.progress-holder, .filename').remove();
-                // response is the JSON object that post_file.php returns
-                $.data(file).attr('data-image-path', response.imagePath);
-                $.data(file).find('.thumbnail').attr('src', response.thumbnailPath);
+            submit: function(e, data) {
+                // console.log('submit', data);
+                // create thumbnail client side?
+            },
+
+            done: function(e, data) {
+                var preview = data.context;
+
+                //console.log('done', data);
+                preview.removeClass('new').attr('data-image-path', data.result.imagePath);
+                preview.find('.progress-holder, .filename').remove();
+                preview.find('.thumbnail').attr('src', data.result.thumbnailPath);
                 fillInHiddenInputs(inputName);
             },
-            
-            error: function(err, file) {
-                switch(err) {
-                    case 'BrowserNotSupported':
-                        showMessage('Your browser does not support HTML5 file uploads!');
-                        break;
-                    case 'TooManyFiles':
-                        alert('Too many files! Please select 5 at most! (configurable)');
-                        break;
-                    case 'FileTooLarge':
-                        alert(file.name+' is too large! Please upload files up to 2mb (configurable).');
-                        break;
-                    default:
-                        alert('Sorry, an error occurred while uploading file. Please contact your system administrator.')
-                        break;
-                }
+
+            fail: function(e, data) {
+                //console.log('failed', data);
+                // display errors
             },
-            
-            // Called before each upload is started
-            beforeEach: function(file){
-                if(!file.type.match(/^image\//)){
-                    alert('Only images are allowed!');
-                    
-                    // Returning false will cause the
-                    // file to be rejected
-                    return false;
-                }
+
+            always: function(e, data) {
+                //console.log('always', data);
+                stats.text('');
             },
-            
-            uploadStarted:function(i, file, len){
-                createImage(file);
+
+            progress: function(e, data) {
+                //console.log('progress', data);
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                data.context.find('.progress').css('width', progress + '%');
             },
-            
-            progressUpdated: function(i, file, progress) {
-                $.data(file).find('.progress').css('width', progress + '%');
-            }
-             
+
+            progressall: function(e, data) {
+                //console.log('progressall', data);
+                stats.text(sizeformat(data.loaded) +
+                    ' of ' + sizeformat(data.total) +
+                    ' (' + sizeformat(data.bitrate) + 'ps)');
+            },
         });
-        
-        var template =
-            '<div class="new preview">'+
-                '<span class="image-holder">'+
-                    '<img class="thumbnail" />'+
-                    '<span class="buttons">'+
-                        '<a href="javascript:void(0)" class="enlarge-button">'+
-                            '<img src="'+ staticURL + 'files_widget/img/enlarge_button.png" />'+
-                        '</a> '+
-                        '<a href="javascript:void(0)" class="remove-button">'+
-                            '<img src="'+ staticURL + 'files_widget/img/close_button.png" />'+
-                        '</a>'+
-                    '</span>'+
-                '</span>'+
-                '<div class="progress-holder">'+
-                    '<div class="progress"></div>'+
-                '</div>'+
-            '</div>';
-
-        var deletedTemplate =
-            '<div class="deleted-file">'+
-                '<span class="image-holder">'+
-                    '<img class="icon" />'+
-                '</span>'+
-                '<span class="name"></span>'+
-                '<span class="undo">'+
-                    '<a href="javascript:void(0);" class="undo-remove-button">'+
-                        'Undo'+
-                    '</a>'+
-                '</span>'+
-            '</div>';
-
-        
-        function createImage(file) {
-
-            var preview = $(template), 
-                image = $('.thumbnail', preview);
-                
-            var reader = new FileReader();
-            
-            //image.width = 100;
-            //image.height = 100;
-            
-            reader.onload = function(e){
-                
-                // e.target.result holds the DataURL which
-                // can be used as a source of the image:
-                
-                image.attr('src', e.target.result);
-            };
-            
-            // Reading the file as a DataURL. When finished,
-            // this will trigger the onload function above:
-            if (file.size < 500000) {
-                reader.readAsDataURL(file);
-            } else {
-                preview.find('.image-holder').append('<span class="filename">' + file.name + '</span>');
-            }
-            
-            message.hide();
-            preview.appendTo(dropbox);
-            
-            // Associating a preview container
-            // with the file, using jQuery's $.data():
-            
-            $.data(file,preview);
-        }
-
-        function showMessage(msg){
-            message.html(msg);
-        }
-
     });
-
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
 });

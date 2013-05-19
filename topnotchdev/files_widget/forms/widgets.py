@@ -12,7 +12,8 @@ class ImagesWidget(forms.MultiWidget):
             JQUERY_PATH,
             JQUERY_UI_PATH,
             FILEBROWSER_JS_PATH,
-            'files_widget/js/jquery.filedrop.js',
+            'files_widget/js/jquery.iframe-transport.js',
+            'files_widget/js/jquery.fileupload.js',
             'files_widget/js/widgets.js',
         )
         css = {

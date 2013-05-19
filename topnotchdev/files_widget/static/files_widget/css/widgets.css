@@ -11,7 +11,12 @@
 
 .files-widget-dropbox.dragging-files {
 	background: rgba(0, 0, 0, .05);
-	border: 1px dashed rgba(0, 0, 0, .3);
+	border: 1px dashed rgba(0, 0, 0, .2);
+}
+
+.files-widget-dropbox.dragging-files.dragover {
+	background: rgba(0, 0, 0, .1);
+	border: 1px dashed rgba(0, 0, 0, .4);
 }
 
 .files-widget-dropbox .message {
@@ -175,6 +180,13 @@
 	bottom: 0;
 	right: 0;
 	cursor: pointer;
+}
+
+.files-widget .controls .upload-progress-stats {
+	float: right;
+	display: block;
+	padding-top: 5px;
+	color: #888;
 }
 
 .files-widget-deleted {

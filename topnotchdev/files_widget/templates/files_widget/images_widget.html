@@ -2,7 +2,7 @@
 <div class="files-widget">
     <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}" data-upload-url="{% url 'files_widget_upload' %}" data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}" data-static-url="{{ STATIC_URL }}">
         <span class="message">{% trans 'Drop images here to upload' %}</span>
-        {% for path_to_file in files.splitlines %}
+        {% for path_to_file in files.splitlines %}{% spaceless %}
             <div class="preview" data-image-path="{{ path_to_file }}">
                 <span class="image-holder">
                     <img class="thumbnail" src="{% include 'files_widget/includes/thumbnail.html' %}" />
@@ -16,7 +16,7 @@
                     </span>
                 </span>
             </div>
-        {% endfor %}
+        {% endspaceless %}{% endfor %}
     </div>
     <div class="controls">
         <!--[if lt IE 9]>
@@ -36,6 +36,7 @@
             <a id="link_{{ name }}-filebrowser-result"></a>
             <span id="help_{{ name }}-filebrowser-result"></span>
         </span>
+        <span class="upload-progress-stats"></span>
     </div>
     <div class="files-widget-deleted" style="display: none">
         <p>{% trans 'Images to be removed' %}:</p>
