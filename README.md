@@ -67,7 +67,7 @@ or, for an editable copy in your `src` directory:
 Credits
 -------
 
-- [jQuery Filedrop 0.1](https://github.com/weixiyen/jquery-filedrop) (forked)
+- [jQuery File Upload](https://github.com/blueimp/jQuery-File-Upload/wiki/Options)
 - [Tutorial on jQuery Filedrop](http://tutorialzine.com/2011/09/html5-file-upload-jquery-php/) by Martin Angelov
 - [Tutorial on Django AJAX file upload](http://kuhlit.blogspot.nl/2011/04/ajax-file-uploads-and-csrf-in-django-13.html) by Alex Kuhl
 - [Answer on non-Model user permissions](http://stackoverflow.com/questions/13932774/how-can-i-use-django-permissions-without-defining-a-content-type-or-model) on Stackoverflow
