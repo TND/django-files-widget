@@ -36,7 +36,6 @@ setup(
     zip_safe=True,
     install_requires=[
         'sorl-thumbnail',
-        'mezzanine',
     ],
     entry_points="""
         # -*- Entry points: -*-
