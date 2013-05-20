@@ -55,8 +55,6 @@
 }
 
 .files-widget-dropbox .preview .thumbnail {
-	max-width: 150px;
-	max-height: 150px;
 	vertical-align: middle;
 }
 
@@ -65,8 +63,6 @@
 }
 
 .files-widget-dropbox .preview.new .thumbnail:not([src]) {
-	width: 100px;
-	height: 100px;
 	background: #ddd;
 }
 

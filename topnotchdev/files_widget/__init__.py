@@ -1,1 +1,1 @@
-from fields import ImagesField
+from fields import FileField, FilesField, ImageField, ImagesField

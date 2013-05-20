@@ -6,7 +6,18 @@ from django.utils.translation import ugettext_lazy as _
 from topnotchdev.files_widget.conf import *
 
 
-class ImagesWidget(forms.MultiWidget):
+class BaseFilesWidget(forms.MultiWidget):
+    def __init__(self,
+            multiple=False,
+            preview_size=150,
+            template="files_widget/files_widget.html",
+            widgets=(forms.HiddenInput, forms.HiddenInput, forms.HiddenInput, ),
+            **kwargs):
+        super(BaseFilesWidget, self).__init__(widgets, **kwargs)
+        self.multiple = multiple
+        self.preview_size = preview_size
+        self.template = template
+
     class Media:
         js = (
             JQUERY_PATH,
@@ -34,9 +45,31 @@ class ImagesWidget(forms.MultiWidget):
         context = {
             'MEDIA_URL': settings.MEDIA_URL,
             'STATIC_URL': settings.STATIC_URL,
-            'input_string': super(ImagesWidget, self).render(name, value, attrs),
+            'input_string': super(BaseFilesWidget, self).render(name, value, attrs),
             'name': name,
             'files': files,
             'deleted_files': deleted_files,
+            'multiple': self.multiple and 1 or 0,
+            'preview_size': unicode(self.preview_size),
         }
-        return render_to_string("files_widget/images_widget.html", context)
+        return render_to_string(self.template, context)
+
+
+class FileWidget(BaseFilesWidget):
+    def __init__(self, multiple=False, preview_size=128, **kwargs):
+        super(FileWidget, self).__init__(multiple, preview_size, **kwargs)
+
+
+class FilesWidget(BaseFilesWidget):
+    def __init__(self, multiple=True, preview_size=64, **kwargs):
+        super(FilesWidget, self).__init__(multiple, preview_size, **kwargs)
+
+
+class ImageWidget(BaseFilesWidget):
+    def __init__(self, multiple=False, preview_size=250, **kwargs):
+        super(ImageWidget, self).__init__(multiple, preview_size, **kwargs)
+
+
+class ImagesWidget(BaseFilesWidget):
+    def __init__(self, multiple=True, preview_size=150, **kwargs):
+        super(ImagesWidget, self).__init__(multiple, preview_size, **kwargs)

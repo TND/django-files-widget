@@ -41,6 +41,11 @@ def upload(request):
     path_to_file = save_upload(upload, filename, is_raw, request.user)
     MEDIA_URL = settings.MEDIA_URL
 
+    if 'preview_size' in request.POST:
+        preview_size = request.POST['preview_size']
+    else:
+        preview_size = '64'
+
     return HttpResponse(json.dumps({
         'success': True,
         'imagePath': path_to_file,
@@ -49,6 +54,11 @@ def upload(request):
 
 @permission_required('files_widget.can_upload_files')
 def thumbnail_url(request):
-    if not 'img' in request.GET:
+    if not 'img' in request.GET or not 'preview_size' in request.GET:
         return Http404
-    return HttpResponse(render_to_string('files_widget/includes/thumbnail.html', { 'path_to_file': request.GET['img'] }))
+    
+    template_url = render_to_string('files_widget/includes/thumbnail.html', {
+        'path_to_file': request.GET['img'],
+        'preview_size': request.GET['preview_size'],
+    })
+    return HttpResponse(template_url)

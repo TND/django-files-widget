@@ -36,8 +36,12 @@ def make_temp_directory(filename, user):
     public_dir = construct_temp_path(user)
     full_dir = '%s%s' % (settings.MEDIA_ROOT, public_dir)
 
-    if not os.path.exists(full_dir):
-        os.makedirs(full_dir)
+    try:
+        if not os.path.exists(full_dir):
+            os.makedirs(full_dir)
+    except EnvironmentError:
+        # deepest dir already exists
+        pass
 
     full_path = '%s%s' % (full_dir, filename)
     available_full_path = default_storage.get_available_name(full_path)

@@ -1,2 +1,2 @@
-from fields import ImagesFormField
-from widgets import ImagesWidget
+from fields import *
+from widgets import *

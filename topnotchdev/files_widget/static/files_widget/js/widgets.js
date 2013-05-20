@@ -5,6 +5,8 @@ $(function(){
         effectTime = 200,
         mediaURL = $('[data-media-url]').data('media-url'),
         staticURL = $('[data-static-url]').data('static-url'),
+        thumbnailURL = $('[data-get-thumbnail-url]').data('get-thumbnail-url'),
+        undoText = $('[data-undo-text]').data('undo-text'),
         template,
         deletedTemplate;
 
@@ -34,7 +36,7 @@ $(function(){
             '<span class="name"></span>'+
             '<span class="undo">'+
                 '<a href="javascript:void(0);" class="undo-remove-button">'+
-                    'Undo'+
+                    undoText+
                 '</a>'+
             '</span>'+
         '</div>';
@@ -44,7 +46,7 @@ $(function(){
     }
 
     function filenameFromPath(path) {
-        return path.replace(/^.+\//);
+        return path.replace(/^.+\//, '');
     }
 
     function stripMediaURL(path) {
@@ -114,10 +116,10 @@ $(function(){
         input.val(value);
     }
 
-    function fillInHiddenInputs(inputName, movedOutFile, movedInFile) {
-        var input = $('input[name="' + inputName + '_0"]'),
-            deletedInput = $('input[name="' + inputName + '_1"]'),
-            movedInput = $('input[name="' + inputName + '_2"]'),
+    function fillInHiddenInputs(dropbox, movedOutFile, movedInFile) {
+        var input = $('input[name="' + dropbox.data('input-name') + '_0"]'),
+            deletedInput = $('input[name="' + dropbox.data('input-name') + '_1"]'),
+            movedInput = $('input[name="' + dropbox.data('input-name') + '_2"]'),
             widget = input.closest('.files-widget'),
             files = widget.find('.preview'),
             deletedFiles = widget.find('.deleted-file');
@@ -128,7 +130,7 @@ $(function(){
         if (movedOutFile) {
             var movedInputValue = splitlines(movedInput.val()),
                 filename = movedOutFile.data('image-path');
-            //console.log(movedOutFile);
+            
             movedInputValue.push(filename);
             movedInput.val(movedInputValue.join('\n'));
         }
@@ -144,6 +146,148 @@ $(function(){
         }
     }
 
+    function downloadThumbnail(preview) {
+        var imagePath = stripMediaURL(preview.data('image-path')),
+            dropbox = preview.closest('.files-widget-dropbox'),
+            previewSize = dropbox.data('preview-size');
+
+        $.get(thumbnailURL,
+                'img=' + imagePath + '&preview_size=' + previewSize,
+                function(data) {
+            preview.find('.thumbnail')
+                .css({ 'width': '', 'height': '' }).attr('src', data);;
+            preview.removeClass('new');
+        });
+    }
+
+    function generateThumbnail(preview, file) {
+        var image = $('.thumbnail', preview),
+            reader = new FileReader(),
+            dropbox = preview.closest('.files-widget-dropbox'),
+            previewSize = dropbox.data('preview-size'),
+            defaultSize = parseInt(+previewSize * 2 / 3, 10);
+
+        reader.onload = function(e) {
+            image.attr('src', e.target.result);
+            image.css({ 'width': '', 'height': '' });
+        };
+        
+        image.css({
+            'max-width': previewSize, 'max-height': previewSize,
+            'width': defaultSize, 'height': defaultSize
+        });
+        
+        if (file.size < 500000) {
+            reader.readAsDataURL(file);
+        } else {
+            $('<span/>').addClass('filename').text(file.name)
+                .appendTo(preview.find('.image-holder'));
+        }
+    }
+
+    function addPreview(dropbox, imagePath, thumbnailPath, file) {
+        var preview = $(template);
+
+        if (dropbox.data('multiple') != 1) {
+            dropbox.find('.preview').each(function() {
+                deletePreview($(this), true);
+            });
+        }
+
+        dropbox.find('.message').hide();
+        preview.hide().insertAfter(dropbox.children(':last-child')).fadeIn(effectTime);
+        if (imagePath) {
+            completePreview(preview, imagePath, thumbnailPath);
+        } else if (file) {
+            generateThumbnail(preview, file);
+        }
+
+        return preview;
+    }
+
+    function completePreview(preview, imagePath, thumbnailPath) {
+        var dropbox = preview.closest('.files-widget-dropbox');
+        
+        preview.removeClass('new').attr('data-image-path', imagePath);
+        preview.find('.progress-holder, .filename').remove();
+
+        if (thumbnailPath) {
+            preview.find('.thumbnail')
+                .css({ 'width': '', 'height': '' }).attr('src', thumbnailPath);
+        } else {
+            downloadThumbnail(preview);
+        }
+        fillInHiddenInputs(dropbox);
+    }
+
+    function onPreviewMove(preview, oldDropbox, newDropbox) {
+        if (oldDropbox.is(newDropbox)) {
+            fillInHiddenInputs(oldDropbox);
+        } else {
+            if (newDropbox.data('multiple') != 1) {
+                newDropbox.find('.preview').not(preview).each(function() {
+                    deletePreview($(this), true);
+                });
+            }
+            fillInHiddenInputs(oldDropbox, preview, null);
+            fillInHiddenInputs(newDropbox, null, preview);
+            if (!oldDropbox.find('.preview').length) {
+                oldDropbox.find('.message').show();
+            }
+            if (oldDropbox.data('preview-size') !== newDropbox.data('preview-size')) {
+                downloadThumbnail(preview);
+            }
+        }
+    }
+
+    function deletePreview(preview, changingToNewPreview) {
+        var dropbox = preview.closest('.files-widget-dropbox'),
+            widget = dropbox.closest('.files-widget'),
+            deletedPreview = $(deletedTemplate),
+            deletedContainer = $('.files-widget-deleted', widget),
+            deletedList = $('.deleted-list', deletedContainer),
+            path = preview.data('image-path');
+
+        function doDelete() {
+            $('.icon', deletedPreview).attr('src', preview.find('.thumbnail').attr('src'));
+            $('.name', deletedPreview).text(filenameFromPath(path));
+            deletedPreview.attr('data-image-path', path);
+            deletedContainer.show();
+            deletedPreview.hide().appendTo(deletedList)
+            deletedPreview.slideDown(effectTime);
+            preview.remove();
+
+            if (!dropbox.find('.preview').length && !changingToNewPreview) {
+                dropbox.find('.message').show();
+            };
+            fillInHiddenInputs(dropbox);
+        }
+
+        if (changingToNewPreview) {
+            doDelete();
+        } else {
+            preview.fadeOut(effectTime, doDelete);
+        }
+    }
+
+    function undoDeletePreview(deletedPreview) {
+        var imagePath = deletedPreview.data('image-path'),
+            thumbnailPath = $('.icon', deletedPreview).attr('stc'),
+            widget = deletedPreview.closest('.files-widget'),
+            dropbox = widget.find('.files-widget-dropbox'),
+            deletedContainer = $('.files-widget-deleted', widget),
+            deletedList = $('.deleted-list', deletedContainer),
+            preview = addPreview(dropbox, imagePath, thumbnailPath);
+        
+        deletedPreview.slideUp(effectTime, function() {
+            $(this).remove();
+            if (!deletedList.find('.deleted-file').length) {
+                deletedContainer.hide();
+            };
+            fillInHiddenInputs(dropbox);
+        });
+    }
+
     $(document).bind('dragover', function (e) {
         e.preventDefault();
         $('.files-widget-dropbox').addClass('dragging-files');
@@ -157,13 +301,11 @@ $(function(){
     widget.each(function() {
         var that = $(this),
             dropbox = $('.files-widget-dropbox', that),
-            inputName = dropbox.data('input-name'),
-            hiddenInput = $('input[name="' + inputName + '_0"]', that),
             filesInput = $('.files-input', that),
-            deletedInput = $('input[name="' + inputName + '_1"]', that),
             message = $('.message', dropbox),
             uploadURL = dropbox.data('upload-url'),
-            fallback_id = filesInput.attr('id'),
+            multiple = dropbox.data('multiple') == 1,
+            previewSize = dropbox.data('preview-size'),
             initialFiles = $('.preview', dropbox),
             fileBrowserResultInput = $('.filebrowser-result', that),
             deletedContainer = $('.files-widget-deleted', that),
@@ -178,43 +320,13 @@ $(function(){
         }
 
         dropbox.on('click', '.remove-button', function() {
-            $(this).closest('.preview').fadeOut(effectTime, function() {
-                var preview = $(this),
-                    deletedPreview = $(deletedTemplate),
-                    path = preview.data('image-path');
-
-                $('.icon', deletedPreview).attr('src', preview.find('.thumbnail').attr('src'));
-                $('.name', deletedPreview).text(filenameFromPath(path));
-                deletedPreview.attr('data-image-path', path);
-                deletedContainer.show();
-                deletedPreview.hide().appendTo(deletedList).slideDown(effectTime);
-                preview.remove();
-
-                if (!dropbox.find('.preview').length) {
-                    message.show();
-                };
-                fillInHiddenInputs(inputName);
-            });
+            var preview = $(this).closest('.preview');
+            deletePreview(preview);
         });
 
         that.on('click', '.undo-remove-button', function() {
-            var deletedPreview = $(this).closest('.deleted-file'),
-                preview = $(template), 
-                image = $('.thumbnail', preview),
-                imagePath = deletedPreview.data('image-path');
-            
-            image.attr('src', $('.icon', deletedPreview).attr('src'));
-            preview.removeClass('new');
-            preview.attr('data-image-path', imagePath).find('.progress-holder').remove();
-            message.hide();
-            preview.hide().insertAfter(dropbox.children(':last-child')).fadeIn(effectTime);
-            deletedPreview.slideUp(effectTime, function() {
-                $(this).remove();
-                if (!deletedList.find('.deleted-file').length) {
-                    deletedContainer.hide();
-                };
-                fillInHiddenInputs(inputName);
-            });
+            var deletedPreview = $(this).closest('.deleted-file');
+            undoDeletePreview(deletedPreview);
         });
 
         dropbox.on('click', '.enlarge-button', function() {
@@ -222,19 +334,9 @@ $(function(){
         });
 
         function onFileBrowserResult() {
-            var preview = $(template), 
-                image = $('.thumbnail', preview),
-                imagePath = stripMediaURL(fileBrowserResultInput.val());
-
-            $.get(dropbox.data('get-thumbnail-url'), 'img=' + imagePath, function(data) {
-                image.attr('src', data);
-                preview.removeClass('new');
-            });
-            preview.attr('data-image-path', imagePath).find('.progress-holder').remove();
-            message.hide();
+            var imagePath = stripMediaURL(fileBrowserResultInput.val()),
+                preview = addPreview(dropbox, imagePath);
             fileBrowserResultInput.val('');
-            preview.insertAfter(dropbox.children(':last-child'));
-            fillInHiddenInputs(inputName);
         }
 
         function checkFileBrowserResult() {
@@ -256,38 +358,28 @@ $(function(){
             checkFileBrowserResult();
         });
 
-        dropbox.sortable({
-            placeholder: 'sortable-placeholder',
-            tolerance: 'pointer',
-            connectWith: '.files-widget-dropbox',
-
-            start: function(e, ui) {
-                $('.sortable-placeholder').width(ui.item.width()).height(ui.item.height());
-            },
-
-            over: function() {
-                message.hide();
-            },
-
-            beforeStop: function(e, ui) {
-                var newInputName = ui.placeholder.parent().data('input-name');
-                if (newInputName == inputName) {
-                    fillInHiddenInputs(inputName);
-                } else {
-                    fillInHiddenInputs(inputName, ui.item, null);
-                    fillInHiddenInputs(newInputName, null, ui.item);
-                    if (!dropbox.find('.preview').length) {
-                        message.show();
-                    }
-                }
-            }
-        });
-
         dropbox.disableSelection();
         dropbox.bind('dragover', function (e) {
             dropbox.addClass('dragover');
         }).bind('dragleave drop', function (e) {
             dropbox.removeClass('dragover');
+        });
+
+        dropbox.sortable({
+            placeholder: 'sortable-placeholder',
+            tolerance: 'pointer',
+            connectWith: '.files-widget-dropbox',
+            //items: '.preview:not(.controls-preview)',
+            start: function(e, ui) {
+                $('.sortable-placeholder').width(ui.item.width()).height(ui.item.height());
+            },
+            over: function() {
+                message.hide();
+            },
+            beforeStop: function(e, ui) {
+                var newDropbox = ui.placeholder.closest('.files-widget-dropbox');
+                onPreviewMove(ui.item, dropbox, newDropbox);
+            }
         });
 
         filesInput.fileupload({
@@ -299,10 +391,8 @@ $(function(){
             paramName: 'files[]',
             limitConcurrentUploads: 3,
             formData: [
-                {
-                    name: 'csrf_token',
-                    value: csrfToken
-                },
+                { name: 'csrf_token', value: csrfToken },
+                { name: 'preview_size', value: previewSize }
             ],
             autoUpload: true,
             maxFileSize: 10000000,
@@ -311,61 +401,32 @@ $(function(){
             previewMaxWidth: 150,
             previewMaxHeight: 150,
             previewCrop: true,
-
             add: function(e, data) {
-                var preview = $(template), 
-                    image = $('.thumbnail', preview),
-                    reader = new FileReader(),
-                    file = data.files[0];
-                //console.log('add', data);
-                reader.onload = function(e){
-                    image.attr('src', e.target.result);
-                };
-                
-                if (file.size < 500000) {
-                    reader.readAsDataURL(file);
-                } else {
-                    $('<span/>').addClass('filename').text(file.name)
-                        .appendTo('.image-holder', preview);
-                }
-                
-                message.hide();
-                preview.insertAfter(dropbox.children(':last-child'));
+                var preview = addPreview(dropbox, undefined, undefined, data.files[0]);
                 data.context = preview;
                 data.submit();
             },
-
             submit: function(e, data) {
                 // console.log('submit', data);
                 // create thumbnail client side?
             },
-
             done: function(e, data) {
-                var preview = data.context;
-
-                //console.log('done', data);
-                preview.removeClass('new').attr('data-image-path', data.result.imagePath);
-                preview.find('.progress-holder, .filename').remove();
-                preview.find('.thumbnail').attr('src', data.result.thumbnailPath);
-                fillInHiddenInputs(inputName);
+                completePreview(data.context,
+                    data.result.imagePath, data.result.thumbnailPath);
             },
-
             fail: function(e, data) {
                 //console.log('failed', data);
                 // display errors
             },
-
             always: function(e, data) {
                 //console.log('always', data);
                 stats.text('');
             },
-
             progress: function(e, data) {
                 //console.log('progress', data);
                 var progress = parseInt(data.loaded / data.total * 100, 10);
                 data.context.find('.progress').css('width', progress + '%');
             },
-
             progressall: function(e, data) {
                 //console.log('progressall', data);
                 stats.text(sizeformat(data.loaded) +

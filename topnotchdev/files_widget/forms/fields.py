@@ -3,14 +3,16 @@ from django.core import exceptions, validators
 from django.utils.translation import ugettext_lazy as _
 
 from topnotchdev.files_widget.conf import *
-from widgets import ImagesWidget
 
 
 class UnicodeWithAttr(unicode):
     deleted_files = None
     moved_files = None
 
-class ImagesFormField(forms.MultiValueField):
+class FilesFormField(forms.MultiValueField):
+    def __init__(self, max_length=None, **kwargs):
+        super(FilesFormField, self).__init__(**kwargs)
+
     def compress(self, data_list):
         files = UnicodeWithAttr(data_list[0])
         files.deleted_files = data_list[1]
