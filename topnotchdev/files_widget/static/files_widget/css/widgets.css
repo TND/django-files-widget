@@ -114,9 +114,9 @@
 	position: absolute;
 	background-color: #252f38;
 	height: 10px;
-	right: 10px;
-	left: 10px;
-	bottom: 10px;
+	right: 8px;
+	left: 8px;
+	bottom: 8px;
 	box-shadow: 0 0 2px #000;
 }
 
@@ -143,28 +143,10 @@
 }
 
 .files-widget .controls .fake-files-input {
-	margin-top: 0;
-	margin-bottom: 0;
-	padding: 4px 8px 3px;
-	width: auto;
-	color: #fff;
-	border: none;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	background: #acd7e5;
-	cursor: pointer;
-	background: -webkit-gradient(linear, left top, left bottom, from(#acd7e5), to(#a4cedb));
 	margin-left: 2px;
 	position: relative;
 	display: inline-block;
-	vertical-align: middle;
-	font-weight: bold;
 	overflow: hidden;
-}
-
-.files-widget .controls .fake-files-input:hover {
-    background: #444;
 }
 
 .files-widget .controls .files-input {

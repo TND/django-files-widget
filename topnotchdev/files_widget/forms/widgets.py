@@ -40,7 +40,8 @@ class BaseFilesWidget(forms.MultiWidget):
 
     def render(self, name, value, attrs=None):
         if not isinstance(value, list):
-            files, deleted_files, moved_files = self.decompress(value)
+            value = self.decompress(value)
+        files, deleted_files, moved_files = value
 
         context = {
             'MEDIA_URL': settings.MEDIA_URL,

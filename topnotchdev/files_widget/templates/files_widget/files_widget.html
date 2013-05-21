@@ -28,12 +28,12 @@
         <!--[if lt IE 9]>
             <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
-        <span class="fake-files-input">
-            <span>{% trans 'Upload' %}</span>
+        <a href="javascript:void(0)" class="fake-files-input">
+            <span>{% trans 'Upload' %}...</span>
             <input type="file" class="files-input" id="{{ name }}-files" multiple="mulitple" />
-        </span>
-        &nbsp;
-        <button onclick="return false;" class="media-library-button">{% trans 'Library' %}</button>
+        </a>
+        &nbsp;|&nbsp;
+        <a href="javascript:void(0)" class="media-library-button">{% trans 'Library' %}</a>
         {{ input_string }}
         {# here comes the hacked mezzanine-filebrowser-safe integration #}
         <span class="hacked-filebrowser-integration" style="display: none !important;">

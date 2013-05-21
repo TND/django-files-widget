@@ -7,8 +7,8 @@ FILES_DIR = getattr(settings, 'FILES_WIDGET_FILES_DIR', 'uploads/files_widget/')
 OLD_VALUE_STR = getattr(settings, 'FILES_WIDGET_OLD_VALUE_STR', 'old_%s_value')
 DELETED_VALUE_STR = getattr(settings, 'FILES_WIDGET_DELETED_VALUE_STR', 'deleted_%s_value')
 MOVED_VALUE_STR = getattr(settings, 'FILES_WIDGET_MOVED_VALUE_STR', 'moved_%s_value')
-JQUERY_PATH = getattr(settings, 'FILES_WIDGET_JQUERY_PATH', 'mezzanine/js/jquery-1.7.1.min.js')
-JQUERY_UI_PATH = getattr(settings, 'FILES_WIDGET_JQUERY_UI_PATH', 'js/jquery-ui-1.10.3.custom.js')
+JQUERY_PATH = getattr(settings, 'FILES_WIDGET_JQUERY_PATH', '//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js')
+JQUERY_UI_PATH = getattr(settings, 'FILES_WIDGET_JQUERY_UI_PATH', '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
 FILEBROWSER_JS_PATH = getattr(settings, 'FILES_WIDGET_FILEBROWSER_JS_PATH', 'filebrowser/js/AddFileBrowser.js')
 
 if not len(MEDIA_ROOT) or not len(TEMP_DIR) or not len(FILES_DIR) or TEMP_DIR == FILES_DIR:

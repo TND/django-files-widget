@@ -12,13 +12,13 @@ from files import manage_files_on_disk
 from conf import *
 
 
-def formfield_defaults(self, default_widget=None, widget=None, form_class=FilesFormField, **kwargs):
+def formfield_defaults(self, default_widget=None, widget=None, form_class=FilesFormField, required=True, **kwargs):
     if not isinstance(widget, BaseFilesWidget):
         widget = default_widget
 
     defaults = {
         'form_class': FilesFormField,
-        'fields': (forms.CharField(), forms.CharField(), forms.CharField(), ),
+        'fields': (forms.CharField(required=required), forms.CharField(required=False), forms.CharField(required=False), ),
         'widget': widget,
     }
     defaults.update(kwargs)
@@ -36,6 +36,9 @@ def save_all_data(self, instance, data):
 
 class FileField(models.CharField):
     description = _("File")
+
+    def __init__(self, max_length=200, **kwargs):
+        super(FileField, self).__init__(max_length=max_length, **kwargs)
 
     def contribute_to_class(self, cls, name):
         super(FileField, self).contribute_to_class(cls, name)

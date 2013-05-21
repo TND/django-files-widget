@@ -391,7 +391,7 @@ $(function(){
             paramName: 'files[]',
             limitConcurrentUploads: 3,
             formData: [
-                { name: 'csrf_token', value: csrfToken },
+                { name: 'csrfmiddlewaretoken', value: csrfToken },
                 { name: 'preview_size', value: previewSize }
             ],
             autoUpload: true,
