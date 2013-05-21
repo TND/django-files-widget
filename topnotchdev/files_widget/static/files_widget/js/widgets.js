@@ -288,7 +288,7 @@ $(function(){
         });
     }
 
-    $(document).bind('dragover', function (e) {
+    $(document).bind('drag dragover', function (e) {
         e.preventDefault();
         $('.files-widget-dropbox').addClass('dragging-files');
     }).bind('drop', function (e) {
@@ -367,9 +367,11 @@ $(function(){
 
         dropbox.sortable({
             placeholder: 'sortable-placeholder',
-            tolerance: 'pointer',
+            //tolerance: 'pointer',
             connectWith: '.files-widget-dropbox',
+            //cursorAt: { top: 0, left: 0 },
             //items: '.preview:not(.controls-preview)',
+            revert: effectTime,
             start: function(e, ui) {
                 $('.sortable-placeholder').width(ui.item.width()).height(ui.item.height());
             },

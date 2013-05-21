@@ -24,10 +24,13 @@ Quick Start
 - (pip install) [sorl-thumbnail](https://github.com/sorl/sorl-thumbnail)
 - (pip install) pillow (or PIL)
 - Unix/Linux (file saving uses `os.link()`)
-- (currently) (pip install) mezzanine; we will remove this requirement before our stable release
 - jQuery 1.7 or later
 - jQuery UI
 - [jQuery File Upload](https://github.com/blueimp/jQuery-File-Upload) (included)
+Optional:
+- [Grappelli](https://github.com/sehmaschine/django-grappelli)
+- [django-filebrowser](https://github.com/sehmaschine/django-filebrowser)
+- [Mezzanine](http://mezzanine.jupo.org/) and its older version of Filebrowser
 
 ### Install ###
 
@@ -134,7 +137,6 @@ Navigation
 
 ### Django Auth Permissions
 [`files_widget.can_upload_files`](#can_upload_files)
-[`files_widget.can_select_files_from_filebrowser`](#can_select_files_from_filebrowser) (not yet implemented)
 [`files_widget.can_remove_files`](#can_remove_files) (not yet implemented)
 
 ### Static Files Inclusion

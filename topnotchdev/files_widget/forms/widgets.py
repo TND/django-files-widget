@@ -6,6 +6,15 @@ from django.utils.translation import ugettext_lazy as _
 from topnotchdev.files_widget.conf import *
 
 
+def use_filebrowser():
+    if USE_FILEBROWSER:
+        try:
+            import filebrowser
+            return True
+        except:
+            pass
+    return False
+
 class BaseFilesWidget(forms.MultiWidget):
     def __init__(self,
             multiple=False,
@@ -19,14 +28,16 @@ class BaseFilesWidget(forms.MultiWidget):
         self.template = template
 
     class Media:
-        js = (
+        js = [
             JQUERY_PATH,
             JQUERY_UI_PATH,
-            FILEBROWSER_JS_PATH,
             'files_widget/js/jquery.iframe-transport.js',
             'files_widget/js/jquery.fileupload.js',
             'files_widget/js/widgets.js',
-        )
+        ]
+        if use_filebrowser():
+            js.append(FILEBROWSER_JS_PATH)
+
         css = {
             'all': (
                 'files_widget/css/widgets.css',
@@ -46,6 +57,7 @@ class BaseFilesWidget(forms.MultiWidget):
         context = {
             'MEDIA_URL': settings.MEDIA_URL,
             'STATIC_URL': settings.STATIC_URL,
+            'use_filebrowser': use_filebrowser(),
             'input_string': super(BaseFilesWidget, self).render(name, value, attrs),
             'name': name,
             'files': files,

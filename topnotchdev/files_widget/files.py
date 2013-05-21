@@ -14,13 +14,16 @@ from conf import *
 def filename_from_path(path):
     return re.sub(r'^.+/', '', path)
 
+def model_slug(model):
+    return slugify(model._meta.verbose_name_plural)
+
 def construct_temp_path(user):
     now = time.localtime()[0:5]
     dir_name = TEMP_DIR_FORMAT % now
     return '%s%s/%i/' % (TEMP_DIR, dir_name, user.pk)
 
 def construct_permanent_path(instance):
-    model_dir = slugify(type(instance)._meta.verbose_name_plural)
+    model_dir = model_slug(type(instance))
     return '%s%s/%i/' % (FILES_DIR, model_dir, instance.pk)
 
 def in_directory(path, directory):

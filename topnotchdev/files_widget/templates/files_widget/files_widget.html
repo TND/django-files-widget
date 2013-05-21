@@ -32,15 +32,20 @@
             <span>{% trans 'Upload' %}...</span>
             <input type="file" class="files-input" id="{{ name }}-files" multiple="mulitple" />
         </a>
-        &nbsp;|&nbsp;
-        <a href="javascript:void(0)" class="media-library-button">{% trans 'Library' %}</a>
+        {% if use_filebrowser %}
+            &nbsp;|&nbsp;
+            <a href="javascript:void(0)" class="media-library-button">{% trans 'Library' %}</a>
+        {% endif %}
         {{ input_string }}
         {# here comes the hacked mezzanine-filebrowser-safe integration #}
         <span class="hacked-filebrowser-integration" style="display: none !important;">
             <input type="hidden" id="{{ name }}-filebrowser-result" class="filebrowser-result" />
             <img id="image_{{ name }}-filebrowser-result" />
             <a id="link_{{ name }}-filebrowser-result"></a>
+            <img id="previewimage_{{ name }}-filebrowser-result" />
+            <a id="previewlink_{{ name }}-filebrowser-result"></a>
             <span id="help_{{ name }}-filebrowser-result"></span>
+            <span id="preview_{{ name }}-filebrowser-result"></span>
         </span>
         <span class="upload-progress-stats"></span>
     </div>
