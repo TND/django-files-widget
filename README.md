@@ -3,7 +3,7 @@ django-files-widget
 
 Django AJAX form widgets and model fields for multiple files/images upload with progress bar
 
-__This is currently a pre-alpha release. Not all functionality is there, only `ImagesField` has been implemented. There is currently no error handling built in at all.__
+__This is currently a pre-alpha release. Not all functionality is there, only `ImageField` and `ImagesField` have been implemented. There is currently no error handling built in at all.__
 
 Features
 --------
@@ -11,26 +11,23 @@ Features
 - Drag &amp; drop file uploading via AJAX
 - Uploading multiple files at once
 - Upload progress bar
-- Multiple or single file upload
 - Four model fields with corresponding form fields and widgets: `ImagesField`, `ImageField`, `FilesField`, and `FileField`
 - Image gallery widget with drag &amp; drop reordering
 - File list widget with file type icons and metadata
+- Integrates with Django Admin, [Grappelli](https://github.com/sehmaschine/django-grappelli), [Django Filebrowser](https://github.com/sehmaschine/django-filebrowser) and [Mezzanine](http://mezzanine.jupo.org/)
 
 Quick Start
 -----------
 
 ### Requirements ###
+
 - Django 1.5 or later
-- (pip install) [sorl-thumbnail](https://github.com/sorl/sorl-thumbnail)
-- (pip install) pillow (or PIL)
+- [sorl-thumbnail](https://github.com/sorl/sorl-thumbnail)
+- [Pillow](https://github.com/python-imaging/Pillow) (or PIL)
 - Unix/Linux (file saving uses `os.link()`)
 - jQuery 1.7 or later
 - jQuery UI
 - [jQuery File Upload](https://github.com/blueimp/jQuery-File-Upload) (included)
-Optional:
-- [Grappelli](https://github.com/sehmaschine/django-grappelli)
-- [django-filebrowser](https://github.com/sehmaschine/django-filebrowser)
-- [Mezzanine](http://mezzanine.jupo.org/) and its older version of Filebrowser
 
 ### Install ###
 
@@ -86,75 +83,85 @@ Navigation
 ----------
 
 ### Settings
-[`FILES_WIDGET_TEMP_DIR`](#FILES_WIDGET_TEMP_DIR)
-[`FILES_WIDGET_FILES_DIR`](#FILES_WIDGET_FILES_DIR)
-[`FILES_WIDGET_JQUERY_PATH`](#FILES_WIDGET_JQUERY_PATH)
-[`FILES_WIDGET_JQUERY_UI_PATH`](#FILES_WIDGET_JQUERY_UI_PATH)
-[`FILES_WIDGET_USE_FILEBROWSER`](#FILES_WIDGET_WITH_FILEBROWSER) (not yet implemented)
-[`FILES_WIDGET_FILEBROWSER_JS_PATH`](#FILES_WIDGET_FILEBROWSER_JS_PATH)
-[`FILES_WIDGET_MAX_FILESIZE`](#FILES_WIDGET_MAX_FILESIZE) (not yet implemented)
-[`FILES_WIDGET_FILE_TYPES`](#FILES_WIDGET_FILE_TYPES) (not yet implemented)
-[`FILES_WIDGET_USE_TRASH`](#FILES_WIDGET_USE_TRASH) (not yet implemented)
-[`FILES_WIDGET_TRASH_DIR`](#FILES_WIDGET_TRASH_DIR) (not yet implemented)
+
+- [`FILES_WIDGET_TEMP_DIR`](#FILES_WIDGET_TEMP_DIR)
+- [`FILES_WIDGET_FILES_DIR`](#FILES_WIDGET_FILES_DIR)
+- [`FILES_WIDGET_JQUERY_PATH`](#FILES_WIDGET_JQUERY_PATH)
+- [`FILES_WIDGET_JQUERY_UI_PATH`](#FILES_WIDGET_JQUERY_UI_PATH)
+- [`FILES_WIDGET_USE_FILEBROWSER`](#FILES_WIDGET_WITH_FILEBROWSER) (not yet implemented)
+- [`FILES_WIDGET_FILEBROWSER_JS_PATH`](#FILES_WIDGET_FILEBROWSER_JS_PATH)
+- [`FILES_WIDGET_MAX_FILESIZE`](#FILES_WIDGET_MAX_FILESIZE) (not yet implemented)
+- [`FILES_WIDGET_FILE_TYPES`](#FILES_WIDGET_FILE_TYPES) (not yet implemented)
+- [`FILES_WIDGET_USE_TRASH`](#FILES_WIDGET_USE_TRASH) (not yet implemented)
+- [`FILES_WIDGET_TRASH_DIR`](#FILES_WIDGET_TRASH_DIR) (not yet implemented)
 
 ### Model Fields
-[`files_widget.FileField()`](#FileField) (not yet implemented)
-[`files_widget.FilesField()`](#FilesField) (not yet implemented)
-[`files_widget.ImageField()`](#ImageField)
-[`files_widget.ImagesField()`](#ImagesField)
+
+- [`files_widget.FileField()`](#FileField) (not yet implemented)
+- [`files_widget.FilesField()`](#FilesField) (not yet implemented)
+- [`files_widget.ImageField()`](#ImageField)
+- [`files_widget.ImagesField()`](#ImagesField)
 
 ### Model Field Options
-[`max_length`](#max_length)
-[`on_delete`](#on_delete) (not yet implemented)
-[`max_files`](#max_files) (not yet implemented)
-[`max_filesize`](#max_filesize) (not yet implemented)
-[`file_types`](#file_types) (not yet implemented)
+
+- [`max_length`](#max_length)
+- [`on_delete`](#on_delete) (not yet implemented)
+- [`max_files`](#max_files) (not yet implemented)
+- [`max_filesize`](#max_filesize) (not yet implemented)
+- [`file_types`](#file_types) (not yet implemented)
 
 ### FilesField and ImagesField Instance Field Methods
-[`splitlines()`](#splitlines)
-[`all()`](#all) (not yet implemented)
-[`next()`](#next) (not yet implemented)
-[`next_n()`](#next_n) (not yet implemented)
-[`has_next()`](#has_next) (not yet implemented)
-[`as_list()`](#as_list) (not yet implemented)
-[`as_gallery()`](#as_gallery) (not yet implemented)
-[`as_carousel()`](#as_carousel) (not yet implemented)
+
+- [`splitlines()`](#splitlines)
+- [`all()`](#all) (not yet implemented)
+- [`next()`](#next) (not yet implemented)
+- [`next_n()`](#next_n) (not yet implemented)
+- [`has_next()`](#has_next) (not yet implemented)
+- [`as_list()`](#as_list) (not yet implemented)
+- [`as_gallery()`](#as_gallery) (not yet implemented)
+- [`as_carousel()`](#as_carousel) (not yet implemented)
 
 ### FileField, FilesField, ImageField and ImagesField Instance Field Methods
-[(unicode)](#unicode)
-[`relative()`](#relative) (not yet implemented)
-[`absolute()`](#absolute) (not yet implemented)
-[`local()`](#local) (not yet implemented)
-[`filename()`](#filename) (not yet implemented)
-[`name()`](#name) (not yet implemented)
-[`ext()`](#ext) (not yet implemented)
-[`img_tag()`](#img_tag) (not yet implemented)
-[`thumbnail()`](#thumbnail) (not yet implemented)
-[`thumbnail_tag()`](#thumbnail_tag) (not yet implemented)
-[`with_thumbnail()`](#with_thumbnail) (not yet implemented)
-[`linked()`](#linked) (not yet implemented)
-[`get_metatata()`](#get_metatata) (not yet implemented)
+
+- [(unicode)](#unicode)
+- [`relative()`](#relative) (not yet implemented)
+- [`absolute()`](#absolute) (not yet implemented)
+- [`local()`](#local) (not yet implemented)
+- [`filename()`](#filename) (not yet implemented)
+- [`name()`](#name) (not yet implemented)
+- [`ext()`](#ext) (not yet implemented)
+- [`img_tag()`](#img_tag) (not yet implemented)
+- [`thumbnail()`](#thumbnail) (not yet implemented)
+- [`thumbnail_tag()`](#thumbnail_tag) (not yet implemented)
+- [`with_thumbnail()`](#with_thumbnail) (not yet implemented)
+- [`linked()`](#linked) (not yet implemented)
+- [`get_metatata()`](#get_metatata) (not yet implemented)
 
 ### Django Auth Permissions
-[`files_widget.can_upload_files`](#can_upload_files)
-[`files_widget.can_remove_files`](#can_remove_files) (not yet implemented)
+
+- [`files_widget.can_upload_files`](#can_upload_files)
+- [`files_widget.can_remove_files`](#can_remove_files) (not yet implemented)
 
 ### Static Files Inclusion
-[`form.media`](#form.media)
-[`files_widget/media.html`](#media.html) (not yet implemented)
-[Manual](#manual-inclusion)
+
+- [`form.media`](#form.media)
+- [`files_widget/media.html`](#media.html) (not yet implemented)
+- [Manual](#manual-inclusion)
 
 ### Signals
-[`files_widget.signals.pre_upload`](#pre_upload) (not yet implemented)
-[`files_widget.signals.post_upload`](#post_upload) (not yet implemented)
-[`files_widget.signals.pre_move`](#pre_move) (not yet implemented)
-[`files_widget.signals.post_move`](#post_move) (not yet implemented)
-[`files_widget.signals.pre_delete`](#pre_delete) (not yet implemented)
-[`files_widget.signals.post_delete`](#post_delete) (not yet implemented)
+
+- [`files_widget.signals.pre_upload`](#pre_upload) (not yet implemented)
+- [`files_widget.signals.post_upload`](#post_upload) (not yet implemented)
+- [`files_widget.signals.pre_move`](#pre_move) (not yet implemented)
+- [`files_widget.signals.post_move`](#post_move) (not yet implemented)
+- [`files_widget.signals.pre_delete`](#pre_delete) (not yet implemented)
+- [`files_widget.signals.post_delete`](#post_delete) (not yet implemented)
 
 ### Signal Handlers
-[`post_save`](#django.post_save)
-[`post_delete`](#django.post_delete) (not yet implemented)
+
+- [`post_save`](#django.post_save)
+- [`post_delete`](#django.post_delete) (not yet implemented)
 
 ### Management Commands
-[`manage.py files_widget cleanup`](#cleanup) (not yet implemented)
+
+- [`manage.py files_widget cleanup`](#cleanup) (not yet implemented)
