@@ -9,6 +9,7 @@ from django.dispatch import receiver
 
 from forms import FilesFormField, BaseFilesWidget, FileWidget, FilesWidget, ImageWidget, ImagesWidget
 from files import manage_files_on_disk
+import controllers
 from conf import *
 
 
@@ -36,6 +37,7 @@ def save_all_data(self, instance, data):
 
 class FileField(models.CharField):
     description = _("File")
+    attr_class = controllers.FilePath
 
     def __init__(self, max_length=200, **kwargs):
         super(FileField, self).__init__(max_length=max_length, **kwargs)
@@ -43,7 +45,7 @@ class FileField(models.CharField):
     def contribute_to_class(self, cls, name):
         super(FileField, self).contribute_to_class(cls, name)
         receiver(post_save, sender=cls)(manage_files_on_disk)
-        #setattr(cls, self.name, self.descriptor_class(self))
+        setattr(cls, self.name, controllers.FilesDescriptor(self))
 
     def save_form_data(self, instance, data):
         save_all_data(self, instance, data)
@@ -56,11 +58,12 @@ class FileField(models.CharField):
 
 class FilesField(models.TextField):
     description = _("Files")
+    attr_class = controllers.FilePaths
 
     def contribute_to_class(self, cls, name):
         super(FilesField, self).contribute_to_class(cls, name)
         receiver(post_save, sender=cls)(manage_files_on_disk)
-        #setattr(cls, self.name, self.descriptor_class(self))
+        setattr(cls, self.name, controllers.FilesDescriptor(self))
 
     def save_form_data(self, instance, data):
         save_all_data(self, instance, data)
@@ -73,6 +76,7 @@ class FilesField(models.TextField):
 
 class ImageField(FileField):
     description = _("Image")
+    attr_class = controllers.ImagePath
 
     def formfield(self, default_widget=ImageWidget(), **kwargs):
         defaults = formfield_defaults(self, default_widget, **kwargs)
@@ -81,6 +85,7 @@ class ImageField(FileField):
 
 class ImagesField(FilesField):
     description = _("Images")
+    attr_class = controllers.ImagePaths
 
     def formfield(self, default_widget=ImagesWidget(), **kwargs):
         defaults = formfield_defaults(self, default_widget, **kwargs)

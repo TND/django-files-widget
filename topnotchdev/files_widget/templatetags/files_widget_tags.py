@@ -3,17 +3,12 @@ import urllib
 
 from django import template
 
+from topnotchdev.files_widget.controllers import thumbnail_format
+
 
 register = template.Library()
 
-@register.filter
-def thumbnail_format(filename):
-    match = re.search(r'\.\w+$', filename)
-    if match:
-        ext = match.group(0)
-        if ext.lower() in ['.gif', '.png']:
-            return 'PNG'
-    return 'JPEG'
+register.filter(thumbnail_format)
 
 @register.filter
 def filename_from_path(path):

@@ -1,94 +1,244 @@
+import re
+import urllib
+import os, os.path
+from datetime import datetime
 
-class UnicodeWithAttrs(unicode):
-    pass
+from django.conf import settings
+from django.utils import six
+from django.utils.safestring import mark_safe
+from django.utils.functional import curry
 
-class FileUnicode(UnicodeWithAttrs):
-    def url_escaped(self):
-        return ImageUnicode(self)
+from sorl.thumbnail import get_thumbnail
 
-    def filename(self):
-        return ImageUnicode(self)
 
-    def icon(self):
-        return ImageUnicode(self)
+def thumbnail_format(filename):
+    match = re.search(r'\.\w+$', filename)
+    if match:
+        ext = match.group(0)
+        if ext.lower() in ['.gif', '.png']:
+            return 'PNG'
+    return 'JPEG'
 
-    def icon_N(self):
-        return ImageUnicode(self)
 
+class FilePath(unicode):
+    def __new__(cls, str, instance=None, field=None, **kwargs):
+        self = super(FilePath, cls).__new__(cls, str, **kwargs)
+        self._instance = instance
+        self._field = field
+        self._exists = None
+        self._size = None
+        self._accessed_time = None
+        self._created_time = None
+        self._modified_time = None
+        self._thumbnails = {}
+        return self
+
+    def _html_attrs(self, **kwargs):
+        attrs = {}
+        attrs.update(kwargs)
+        if 'css_class' in attrs:
+            attrs['class'] = attrs['css_class']
+            del attrs['css_class']
+        return attrs
+
+    @property
+    def escaped(self):
+        return urllib.unquote(self)
+
+    @property
     def url(self):
-        return ImageUnicode(self)
+        if not self.startswith('/') and self.find('//') == -1:
+            return '%s%s' % (settings.MEDIA_URL, self.escaped)
+        return self.escaped
 
-    def abs_path(self):
-        return ImageUnicode(self)
-
+    @property
     def local_path(self):
-        return ImageUnicode(self)
+        if not self.startswith('/') and self.find('//') == -1:
+            return u'%s%s' % (settings.MEDIA_ROOT, self)
+        return self
 
-    def with_link(self, **attrs):
-        return ImageUnicode(self)
+    @property
+    def filename(self):
+        return urllib.unquote(re.sub(r'^.+\/', '', self))
+
+    @property
+    def name(self):
+        return re.sub(r'\.[\w\d]+$', '', self.filename)
+
+    @property
+    def ext(self):
+        return re.sub(r'^.+\.', '', self.filename)
 
     def exists(self):
-        return os.path.exists(self.path(self))
+        if self._exists == None:
+            self._exists = os.path.exists(self.local_path)
+        return self._exists
 
-    def get_size(self, name):
-        return os.path.getsize(self.path(self))
+    def get_size(self):
+        if self._size == None:
+            self._size = os.path.getsize(self.local_path)
+        return self._size
 
-    def get_accessed_time(self, name):
-        return datetime.fromtimestamp(os.path.getatime(self.path(self)))
+    def get_accessed_time(self):
+        if self._accessed_time == None:
+            self._accessed_time = datetime.fromtimestamp(os.path.getatime(self.local_path))
+        return self._accessed_time
 
-    def get_created_time(self, name):
-        return datetime.fromtimestamp(os.path.getctime(self.path(self)))
+    def get_created_time(self):
+        if self._created_time == None:
+            self._created_time = datetime.fromtimestamp(os.path.getctime(self.local_path))
+        return self._created_time
 
-    def get_modified_time(self, name):
-        return datetime.fromtimestamp(os.path.getmtime(self.path(self)))
-
-
-class ImageUnicode(FileUnicode):
-    def img_tag(self, **attrs):
-        return type(self)()
-
-    def resized(self, **attrs):
-        return ImageUnicode(self)
-
-    def resized_MxN(self):
-        return ImageUnicode(self)
-
-    def with_lightbox(self):
-        return ImageUnicode(self)
+    def get_modified_time(self):
+        if self._modified_time == None:
+            self._modified_time = datetime.fromtimestamp(os.path.getmtime(self.local_path))
+        return self._modified_time
 
 
-class FilesIterator(object):
-    def get_item_class(self):
-        return FileUnicode
+class ImagePath(FilePath):
+    def img_tag(self, **kwargs):
+        attrs = self._html_attrs(**kwargs)
+        attrs_str = ''.join([
+            u'%s="%s" ' % (key, value)
+            for key, value in attrs.items()
+        ])
+        return mark_safe(u'<img src="%s" %s/>' % (self.url, attrs_str))
 
-    def next(self):
-        return ''
+    def thumbnail(self, size, **kwargs):
+        attrs = {
+            'format': thumbnail_format(self),
+            'upscale': False,
+        }
+        attrs.update(kwargs)
 
-    def next_N(self):
-        return ''
+        all_attrs = { 'size': size }
+        all_attrs.update(attrs)
+        key = hash(frozenset(all_attrs))
 
-    def has_next(self):
-        return 1
+        if not key in self._thumbnails:
+            try:
+                thumbnail = get_thumbnail(self.local_path, size, **attrs)
+            except EnvironmentError:
+                return ''
+            self._thumbnails[key] = thumbnail
+        else:
+            thumbnail = self._thumbnails[key]
+
+        return thumbnail
+
+    def thumbnail_mxn(self, width, height, **kwargs):
+        size = '%dx%d' % (width, height)
+        return self.thumbnail(size)
+
+    def thumbnail_tag(self, size, thumbnail_attrs={}, **kwargs):
+        thumbnail = self.thumbnail(size, **thumbnail_attrs)
+        src = ImagePath(thumbnail.url, self._instance, self._field)
+        attrs = { 'width': thumbnail.width, 'height': thumbnail.height }
+        attrs.update(kwargs)
+        return src.img_tag(**attrs)
+
+    def thumbnail_tag_mxn(self, width, height, **kwargs):
+        size = '%dx%d' % (width, height)
+        return self.thumbnail_tag(size, **kwargs)
+
+    def __getattr__(self, attr):
+        thumbnail_mxn = re.match(r'^thumbnail_(tag_)?(\d+)x(\d+)$', attr)
+        if thumbnail_mxn:
+            tag = thumbnail_mxn.group(1) == 'tag_'
+            width = int(thumbnail_mxn.group(2))
+            height = int(thumbnail_mxn.group(3))
+            if tag:
+                return curry(self.thumbnail_tag_mxn, width, height)
+            else:
+                return curry(self.thumbnail_mxn, width, height)
+
+        raise AttributeError
+
+
+class FilePaths(unicode):
+    item_class = FilePath
+
+    def __new__(cls, str, instance, field, **kwargs):
+        self = super(FilePaths, cls).__new__(cls, str, **kwargs)
+        self.instance = instance
+        self.field = field
+        self._all = None
+        self._length = None
+        self._current = 0
+        return self
 
     def all(self):
-        return []
+        if self._all == None:
+            self._all = []
+            for f in self.splitlines():
+                self._all.append(self.field.attr_class.item_class(f, self.instance, self.field))
 
-    def as_grid(self):
-        return ''
+            self._length = len(self._all)
 
-    def as_list(self):
-        return ''
+        return self._all
 
-    def as_table(self):
-        return ''
+    def next(self):
+        files = self.all()[self._current]
+        self._current += 1
+        return files
+
+    def next_n(self, n):
+        files = self.all()[self._current:self._current+n]
+        self._current += n
+        return files
+
+    def next_all(self):
+        files = self.all()[self._current:]
+        self._current = self._length - 1
+        return files
+
+    def has_next(self):
+        self.all()
+        return max(0, self._length - self._current - 1)
+
+    def reset(self):
+        self._current = 0
+
+    def __getattr__(self, attr):
+        next_n = re.match(r'^next_(\d+)$', attr)
+        if next_n:
+            n = int(next_n.group(1))
+            return curry(self.next_n, n)
+
+        raise AttributeError
 
 
-class ImagesIterator(FilesIterator):
-    def get_item_class(self):
-        return ImageUnicode
-
-    def as_carousel(self):
-        return ''
+class ImagePaths(FilePaths):
+    item_class = ImagePath
 
     def as_gallery(self):
-        return ''
+        raise NotImplementedError
+
+    def as_carousel(self):
+        raise NotImplementedError
+
+
+class FilesDescriptor(object):
+    """
+    Used django.db.models.fields.files.FileDescriptor as an example.
+    This descriptor returns an unicode or list object, with special methods
+    for formatting like filename(), absolute(), relative() and img_tag().
+    """
+    def __init__(self, field):
+        self.field = field
+
+    def __get__(self, instance=None, owner=None):
+        if instance is None:
+            raise AttributeError(
+                "The '%s' attribute can only be accessed from %s instances."
+                % (self.field.name, owner.__name__))
+
+        files = instance.__dict__[self.field.name]
+        if isinstance(files, six.string_types) and not isinstance(files, (FilePath, FilePaths, )) or files is None:
+            attr = self.field.attr_class(files, instance, self.field)
+            instance.__dict__[self.field.name] = attr
+
+        return instance.__dict__[self.field.name]
+
+    def __set__(self, instance, value):
+        instance.__dict__[self.field.name] = value

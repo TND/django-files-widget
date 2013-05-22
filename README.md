@@ -88,7 +88,7 @@ Navigation
 - [`FILES_WIDGET_FILES_DIR`](#FILES_WIDGET_FILES_DIR)
 - [`FILES_WIDGET_JQUERY_PATH`](#FILES_WIDGET_JQUERY_PATH)
 - [`FILES_WIDGET_JQUERY_UI_PATH`](#FILES_WIDGET_JQUERY_UI_PATH)
-- [`FILES_WIDGET_USE_FILEBROWSER`](#FILES_WIDGET_WITH_FILEBROWSER) (not yet implemented)
+- [`FILES_WIDGET_USE_FILEBROWSER`](#FILES_WIDGET_WITH_FILEBROWSER)
 - [`FILES_WIDGET_FILEBROWSER_JS_PATH`](#FILES_WIDGET_FILEBROWSER_JS_PATH)
 - [`FILES_WIDGET_MAX_FILESIZE`](#FILES_WIDGET_MAX_FILESIZE) (not yet implemented)
 - [`FILES_WIDGET_FILE_TYPES`](#FILES_WIDGET_FILE_TYPES) (not yet implemented)
@@ -110,32 +110,36 @@ Navigation
 - [`max_filesize`](#max_filesize) (not yet implemented)
 - [`file_types`](#file_types) (not yet implemented)
 
-### FilesField and ImagesField Instance Field Methods
+### FilesField and ImagesField Instance Attributes
 
 - [`splitlines()`](#splitlines)
-- [`all()`](#all) (not yet implemented)
-- [`next()`](#next) (not yet implemented)
-- [`next_n()`](#next_n) (not yet implemented)
-- [`has_next()`](#has_next) (not yet implemented)
+- [`all()`](#all)
+- [`next()`](#next)
+- [`next_n()`](#next_n)
+- [`has_next()`](#has_next)
 - [`as_list()`](#as_list) (not yet implemented)
 - [`as_gallery()`](#as_gallery) (not yet implemented)
 - [`as_carousel()`](#as_carousel) (not yet implemented)
 
-### FileField, FilesField, ImageField and ImagesField Instance Field Methods
+### FileField, FilesField, ImageField and ImagesField Instance Attributes
 
 - [(unicode)](#unicode)
-- [`relative()`](#relative) (not yet implemented)
-- [`absolute()`](#absolute) (not yet implemented)
-- [`local()`](#local) (not yet implemented)
-- [`filename()`](#filename) (not yet implemented)
-- [`name()`](#name) (not yet implemented)
-- [`ext()`](#ext) (not yet implemented)
-- [`img_tag()`](#img_tag) (not yet implemented)
-- [`thumbnail()`](#thumbnail) (not yet implemented)
-- [`thumbnail_tag()`](#thumbnail_tag) (not yet implemented)
-- [`with_thumbnail()`](#with_thumbnail) (not yet implemented)
-- [`linked()`](#linked) (not yet implemented)
-- [`get_metatata()`](#get_metatata) (not yet implemented)
+- [`escaped()`](#escaped)
+- [`url()`](#url)
+- [`local_path()`](#local_path)
+- [`filename()`](#filename)
+- [`name()`](#name)
+- [`ext()`](#ext)
+- [`img_tag()`](#img_tag)
+- [`thumbnail()`](#thumbnail)
+- [`thumbnail_mxn()`](#thumbnail_mxn)
+- [`thumbnail_tag()`](#thumbnail_tag)
+- [`thumbnail_tag_mxn()`](#thumbnail_tag_mxn)
+- [`exists()`](#exists)
+- [`get_size()`](#get_size)
+- [`get_accessed_time()`](#get_accessed_time)
+- [`get_created_time()`](#get_created_time)
+- [`get_modified_time()`](#get_modified_time)
 
 ### Django Auth Permissions
 
