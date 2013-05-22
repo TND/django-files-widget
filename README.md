@@ -65,6 +65,38 @@ Quick Start
 
     files_widget.can_upload_files
 
+### In Your Templates ###
+
+    <p>A list of linked thumbnails:</p>
+    {% for img in my_instance.images.all %}
+        <a src="{{ img.url }}">
+            {{ img.thumbnail_tag_100x100 }}
+            <span class="caption">{{ img.name }}</span>
+        </a>
+    {% endfor %}
+
+    <p>Only the next image:</p>
+    {{ my_instance.images.next.img_tag }}
+
+    <p>The filename without extension of the next {n} images:</p>
+    {% for img in my_instance.images.next_3 %}
+        {{ img.name }}
+    {% endfor %}
+
+    <p>Or other attributes:</p>
+    {{ my_instance.image.url }}
+    {{ my_instance.image.filename }}
+    {{ my_instance.image.local_path }} (just as an example)
+    {{ my_instance.image.exists }}
+    {{ my_instance.image.get_size }}
+    {{ my_instance.image.thumbnail_64x64.url }}
+    ...
+
+License
+-------
+
+MIT
+
 Credits
 -------
 
