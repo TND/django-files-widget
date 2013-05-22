@@ -42,12 +42,16 @@ Quick Start
         ...,
     )
     
-    # basic settings with their defaults
-    FILES_WIDGET_TEMP_DIR = 'temp/files_widget/'        # inside MEDIA_ROOT
-    FILES_WIDGET_FILES_DIR = 'uploads/files_widget/'    # inside MEDIA_ROOT
-    FILES_WIDGET_JQUERY_PATH = ...
-    FILES_WIDGET_JQUERY_UI_PATH = ...
-    THUMBNAIL_DEBUG = True # sorl-thumbnail debug
+basic settings with their defaults:
+
+    FILES_WIDGET_TEMP_DIR        # 'temp/files_widget/'
+    FILES_WIDGET_FILES_DIR       # 'uploads/files_widget/'
+    FILES_WIDGET_JQUERY_PATH     # (jQuery 1.9.1 from Google)
+    FILES_WIDGET_JQUERY_UI_PATH  #  (jQuery UI 1.10.3 from Google)
+    FILES_WIDGET_USE_FILEBROWSER # False
+    FILES_WIDGET_FILEBROWSER_JS_PATH
+                                 # 'filebrowser/js/AddFileBrowser.js'
+    THUMBNAIL_DEBUG              # False
 
 ### In `urls.py` ###
 
