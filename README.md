@@ -3,7 +3,7 @@ django-files-widget
 
 Django AJAX form widgets and model fields for multiple files/images upload with progress bar
 
-__This is currently a pre-alpha release. Not all functionality is there, only `ImageField` and `ImagesField` have been implemented. There is currently no error handling built in at all.__
+__This is currently an alpha release. Not all functionality is there, only `ImageField` and `ImagesField` have been implemented and there is not yet enough error handling.__
 
 Features
 --------
@@ -124,12 +124,12 @@ Navigation
 ### FileField, FilesField, ImageField and ImagesField Instance Attributes
 
 - [(unicode)](#unicode)
-- [`escaped()`](#escaped)
-- [`url()`](#url)
-- [`local_path()`](#local_path)
-- [`filename()`](#filename)
-- [`name()`](#name)
-- [`ext()`](#ext)
+- [`escaped`](#escaped)
+- [`url`](#url)
+- [`local_path`](#local_path)
+- [`filename`](#filename)
+- [`name`](#name)
+- [`ext`](#ext)
 - [`img_tag()`](#img_tag)
 - [`thumbnail()`](#thumbnail)
 - [`thumbnail_mxn()`](#thumbnail_mxn)
