@@ -1,1 +1,2 @@
 recursive-include topnotchdev *
+recursive-exclude topnotchdev/files_widget/static/docs *
