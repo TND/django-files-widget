@@ -44,14 +44,13 @@ Quick Start
     
 basic settings with their defaults:
 
-    FILES_WIDGET_TEMP_DIR        # 'temp/files_widget/'
-    FILES_WIDGET_FILES_DIR       # 'uploads/files_widget/'
-    FILES_WIDGET_JQUERY_PATH     # (jQuery 1.9.1 from Google)
-    FILES_WIDGET_JQUERY_UI_PATH  #  (jQuery UI 1.10.3 from Google)
-    FILES_WIDGET_USE_FILEBROWSER # False
-    FILES_WIDGET_FILEBROWSER_JS_PATH
-                                 # 'filebrowser/js/AddFileBrowser.js'
-    THUMBNAIL_DEBUG              # False
+    FILES_WIDGET_TEMP_DIR            # 'temp/files_widget/'
+    FILES_WIDGET_FILES_DIR           # 'uploads/files_widget/'
+    FILES_WIDGET_JQUERY_PATH         # (jQuery 1.9.1 from Google)
+    FILES_WIDGET_JQUERY_UI_PATH      # (jQuery UI 1.10.3 from Google)
+    FILES_WIDGET_USE_FILEBROWSER     # False
+    FILES_WIDGET_FILEBROWSER_JS_PATH # 'filebrowser/js/AddFileBrowser.js'
+    THUMBNAIL_DEBUG                  # False
 
 ### In `urls.py` ###
 
@@ -71,23 +70,27 @@ basic settings with their defaults:
 
 ### In Your Templates ###
 
-    <p>A list of linked thumbnails:</p>
+A list of linked thumbnails:
+
     {% for img in my_instance.images.all %}
         <a src="{{ img.url }}">
             {{ img.thumbnail_tag_100x100 }}
-            <span class="caption">{{ img.name }}</span>
+            <span class="caption">{{ img.filename }}</span>
         </a>
     {% endfor %}
 
-    <p>Only the next image:</p>
+Only the next image:
+
     {{ my_instance.images.next.img_tag }}
 
-    <p>The filename without extension of the next {n} images:</p>
+The filename without extension and underscores of the next 3 (or n) images:
+
     {% for img in my_instance.images.next_3 %}
-        {{ img.name }}
+        {{ img.display_name }}
     {% endfor %}
 
-    <p>Or other attributes:</p>
+Or other attributes:
+
     {{ my_instance.image.url }}
     {{ my_instance.image.filename }}
     {{ my_instance.image.local_path }} (just as an example)
@@ -150,6 +153,9 @@ Navigation
 
 - [`splitlines()`](#splitlines)
 - [`all()`](#all)
+- [`count()`](#count)
+- [`first()`](#first)
+- [`last()`](#last)
 - [`next()`](#next)
 - [`next_n()`](#next_n)
 - [`has_next()`](#has_next)
@@ -160,11 +166,12 @@ Navigation
 ### FileField, FilesField, ImageField and ImagesField Instance Attributes
 
 - [(unicode)](#unicode)
+- [`settings`](#settings-attr)
 - [`escaped`](#escaped)
 - [`url`](#url)
 - [`local_path`](#local_path)
 - [`filename`](#filename)
-- [`name`](#name)
+- [`display_name`](#display_name)
 - [`ext`](#ext)
 - [`img_tag()`](#img_tag)
 - [`thumbnail()`](#thumbnail)
