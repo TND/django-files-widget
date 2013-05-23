@@ -138,9 +138,6 @@ class ImagePath(FilePath):
 
         return thumbnail
 
-    def _thumbnail_mxn(self, size, **kwargs):
-        return self.thumbnail(size)
-
     def thumbnail_tag(self, size, opts={}, **kwargs):
         thumbnail = self.thumbnail(size, **opts)
         src = ImagePath(thumbnail.url, self._instance, self._field)
@@ -149,18 +146,15 @@ class ImagePath(FilePath):
         attrs.update(kwargs)
         return src.img_tag(**attrs)
 
-    def _thumbnail_tag_mxn(self, size, opts={}, **kwargs):
-        return self.thumbnail_tag(size, opts, **kwargs)
-
     def __getattr__(self, attr):
         thumbnail_mxn = re.match(r'^thumbnail_(tag_)?(\d*x?\d+)$', attr)
         if thumbnail_mxn:
             tag = thumbnail_mxn.group(1) == 'tag_'
             size = thumbnail_mxn.group(2)
             if tag:
-                return curry(self._thumbnail_tag_mxn, size)
+                return curry(self.thumbnail_tag, size)
             else:
-                return curry(self._thumbnail_mxn, size)
+                return curry(self.thumbnail, size)
 
         raise AttributeError
 
