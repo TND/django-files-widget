@@ -16,8 +16,23 @@ Features
 - File list widget with file type icons and metadata
 - Integrates with Django Admin, [Grappelli](https://github.com/sehmaschine/django-grappelli), [Django Filebrowser](https://github.com/sehmaschine/django-filebrowser) and [Mezzanine](http://mezzanine.jupo.org/)
 
-![File drag & drop to ImagesWidget in Django Admin](/topnotchdev/files_widget/static/docs/img/admin-images-widget-drop.jpg)
-![Ajax upload progress bar in ImagesWidget in Django Admin](/topnotchdev/files_widget/static/docs/img/admin-images-widget-progress.jpg)
+Screenshots
+-----------
+
+<table>
+  <tr>
+    <td>
+      <img alt="File drag & drop to ImagesWidget in Django Admin" src="/topnotchdev/files_widget/static/docs/img/admin-images-widget-drop.jpg" width="350" />
+    </td>
+    <td>
+      <img alt="Ajax upload progress bar in ImagesWidget in Django Admin" src="/topnotchdev/files_widget/static/docs/img/admin-images-widget-progress.jpg" width="350" />
+    </td>
+  </tr>
+  <tr>
+    <td>File drag & drop to ImagesWidget in Django Admin</td>
+    <td>Ajax upload progress bar in ImagesWidget in Django Admin</td>
+  </tr>
+</table>
 
 Quick Start
 -----------
