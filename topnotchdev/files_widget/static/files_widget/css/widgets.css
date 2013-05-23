@@ -56,14 +56,11 @@
 
 .files-widget-dropbox .preview .thumbnail {
 	vertical-align: middle;
+    background: url(/static/files_widget/img/transparent-bg.gif) left top;
 }
 
 .files-widget-dropbox .preview.new .thumbnail {
 	opacity: .5;
-}
-
-.files-widget-dropbox .preview.new .thumbnail:not([src]) {
-	background: #ddd;
 }
 
 .files-widget-dropbox .buttons {

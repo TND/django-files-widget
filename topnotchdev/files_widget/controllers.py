@@ -198,10 +198,10 @@ class FilePaths(unicode):
         return self._length
 
     def first(self):
-        return self.all() and self.all()[0]
+        return self.all() and self.all()[0] or None
 
     def last(self):
-        return self.all() and self.all()[-1]
+        return self.all() and self.all()[-1] or None
 
     def next(self):
         f = self.all()[self._current]
