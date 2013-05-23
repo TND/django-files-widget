@@ -357,7 +357,7 @@ $(function(){
             FileBrowser.show(fileBrowserResultInput.attr('id'), url + '?pop=1');
             checkFileBrowserResult();
         });
-
+        
         dropbox.disableSelection();
         dropbox.bind('dragover', function (e) {
             dropbox.addClass('dragover');

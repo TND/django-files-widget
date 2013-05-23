@@ -11,18 +11,9 @@ from django.utils.functional import curry
 from sorl.thumbnail import get_thumbnail
 
 
-def thumbnail_format(filename):
-    match = re.search(r'\.\w+$', filename)
-    if match:
-        ext = match.group(0)
-        if ext.lower() in ['.gif', '.png']:
-            return 'PNG'
-    return 'JPEG'
-
-
 class FilePath(unicode):
-    def __new__(cls, str, instance=None, field=None, **kwargs):
-        self = super(FilePath, cls).__new__(cls, str, **kwargs)
+    def __new__(cls, str, instance, field, settings={}):
+        self = super(FilePath, cls).__new__(cls, str.strip())
         self._instance = instance
         self._field = field
         self._exists = None
@@ -31,6 +22,12 @@ class FilePath(unicode):
         self._created_time = None
         self._modified_time = None
         self._thumbnails = {}
+        self.settings = {
+            'img_attrs': {},
+            'thumbnail_size': None,
+            'thumbnail_attrs': {},
+        }
+        self.settings.update(settings)
         return self
 
     def _html_attrs(self, **kwargs):
@@ -62,8 +59,10 @@ class FilePath(unicode):
         return urllib.unquote(re.sub(r'^.+\/', '', self))
 
     @property
-    def name(self):
-        return re.sub(r'\.[\w\d]+$', '', self.filename)
+    def display_name(self):
+        without_extension = re.sub(r'\.[\w\d]+$', '', self.filename)
+        with_spaces = re.sub(r'_', ' ', without_extension)
+        return with_spaces
 
     @property
     def ext(self):
@@ -97,18 +96,31 @@ class FilePath(unicode):
 
 class ImagePath(FilePath):
     def img_tag(self, **kwargs):
-        attrs = self._html_attrs(**kwargs)
+        attrs = {}
+        attrs.update(self.settings['img_attrs'])
+        attrs.update(kwargs)
+        attrs = self._html_attrs(**attrs)
         attrs_str = ''.join([
             u'%s="%s" ' % (key, value)
             for key, value in attrs.items()
         ])
         return mark_safe(u'<img src="%s" %s/>' % (self.url, attrs_str))
 
-    def thumbnail(self, size, **kwargs):
+    def _thumbnail_file_format(self):
+        if self.ext.lower() in ['gif', 'png']:
+            return 'PNG'
+        return 'JPEG'
+
+    def thumbnail(self, size=None, **kwargs):
+        size = size or self.settings['thumbnail_size']
+        if not size:
+            raise Exception('No thumbnail size supplied')
+
         attrs = {
-            'format': thumbnail_format(self),
+            'format': self._thumbnail_file_format(),
             'upscale': False,
         }
+        attrs.update(self.settings['thumbnail_attrs'])
         attrs.update(kwargs)
 
         all_attrs = { 'size': size }
@@ -126,31 +138,29 @@ class ImagePath(FilePath):
 
         return thumbnail
 
-    def thumbnail_mxn(self, width, height, **kwargs):
-        size = '%dx%d' % (width, height)
+    def _thumbnail_mxn(self, size, **kwargs):
         return self.thumbnail(size)
 
-    def thumbnail_tag(self, size, thumbnail_attrs={}, **kwargs):
-        thumbnail = self.thumbnail(size, **thumbnail_attrs)
+    def thumbnail_tag(self, size, opts={}, **kwargs):
+        thumbnail = self.thumbnail(size, **opts)
         src = ImagePath(thumbnail.url, self._instance, self._field)
         attrs = { 'width': thumbnail.width, 'height': thumbnail.height }
+        attrs.update(self.settings['img_attrs'])
         attrs.update(kwargs)
         return src.img_tag(**attrs)
 
-    def thumbnail_tag_mxn(self, width, height, **kwargs):
-        size = '%dx%d' % (width, height)
-        return self.thumbnail_tag(size, **kwargs)
+    def _thumbnail_tag_mxn(self, size, opts={}, **kwargs):
+        return self.thumbnail_tag(size, opts, **kwargs)
 
     def __getattr__(self, attr):
-        thumbnail_mxn = re.match(r'^thumbnail_(tag_)?(\d+)x(\d+)$', attr)
+        thumbnail_mxn = re.match(r'^thumbnail_(tag_)?(\d*x?\d+)$', attr)
         if thumbnail_mxn:
             tag = thumbnail_mxn.group(1) == 'tag_'
-            width = int(thumbnail_mxn.group(2))
-            height = int(thumbnail_mxn.group(3))
+            size = thumbnail_mxn.group(2)
             if tag:
-                return curry(self.thumbnail_tag_mxn, width, height)
+                return curry(self._thumbnail_tag_mxn, size)
             else:
-                return curry(self.thumbnail_mxn, width, height)
+                return curry(self._thumbnail_mxn, size)
 
         raise AttributeError
 
@@ -158,29 +168,45 @@ class ImagePath(FilePath):
 class FilePaths(unicode):
     item_class = FilePath
 
-    def __new__(cls, str, instance, field, **kwargs):
-        self = super(FilePaths, cls).__new__(cls, str, **kwargs)
-        self.instance = instance
-        self.field = field
+    def __new__(cls, str, instance, field, settings={}):
+        self = super(FilePaths, cls).__new__(cls, str)
+        self._instance = instance
+        self._field = field
         self._all = None
         self._length = None
         self._current = 0
+        self.settings = {
+            'img_attrs': {},
+            'thumbnail_size': None,
+            'thumbnail_attrs': {},
+        }
+        self.settings.update(settings)
         return self
 
     def all(self):
         if self._all == None:
             self._all = []
             for f in self.splitlines():
-                self._all.append(self.field.attr_class.item_class(f, self.instance, self.field))
+                self._all.append(self._field.attr_class.item_class(f, self._instance, self._field, self.settings))
 
             self._length = len(self._all)
 
         return self._all
 
+    def count(self):
+        self.all()
+        return self._length
+
+    def first(self):
+        return self.all() and self.all()[0]
+
+    def last(self):
+        return self.all() and self.all()[-1]
+
     def next(self):
-        files = self.all()[self._current]
+        f = self.all()[self._current]
         self._current += 1
-        return files
+        return f
 
     def next_n(self, n):
         files = self.all()[self._current:self._current+n]
@@ -221,7 +247,7 @@ class ImagePaths(FilePaths):
 class FilesDescriptor(object):
     """
     Used django.db.models.fields.files.FileDescriptor as an example.
-    This descriptor returns an unicode or list object, with special methods
+    This descriptor returns an unicode object, with special methods
     for formatting like filename(), absolute(), relative() and img_tag().
     """
     def __init__(self, field):
