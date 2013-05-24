@@ -87,18 +87,23 @@ $(function(){
         return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
     }
 
-    function sizeformat(filesize) {
+    function sizeformat(filesize, bits) {
+        var b = 'B';
+        if (bits) {
+            b = 'b';
+        }
+
         // from http://snipplr.com/view/5945/javascript-numberformat--ported-from-php/
         if (filesize >= 1073741824) {
-             filesize = numberformat(filesize / 1073741824, 2, '.', '') + ' GB';
+             filesize = numberformat(filesize / 1073741824, 2, '.', '') + 'G' + b;
         } else { 
             if (filesize >= 1048576) {
-                filesize = numberformat(filesize / 1048576, 2, '.', '') + ' MB';
+                filesize = numberformat(filesize / 1048576, 2, '.', '') + 'M' + b;
         } else { 
                 if (filesize >= 1024) {
-                filesize = numberformat(filesize / 1024, 0) + ' kB';
+                filesize = numberformat(filesize / 1024, 0) + 'k' + b;
             } else {
-                filesize = numberformat(filesize, 0) + 'B';
+                filesize = numberformat(filesize, 0) + b;
                 };
             };
         };
@@ -433,7 +438,7 @@ $(function(){
                 //console.log('progressall', data);
                 stats.text(sizeformat(data.loaded) +
                     ' of ' + sizeformat(data.total) +
-                    ' (' + sizeformat(data.bitrate) + 'ps)');
+                    ' (' + sizeformat(data.bitrate, true) + 'ps)');
             },
         });
     });

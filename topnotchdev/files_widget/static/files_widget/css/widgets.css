@@ -46,7 +46,6 @@
 	border-radius: 3px;
 	background: white;
 	text-align: center;
-	overflow: hidden;
 }
 
 .files-widget-dropbox .image-holder {
@@ -110,6 +109,7 @@
 	left: 0;
 	right: 0;
 	top: 20px;
+	overflow: hidden;
 }
 
 .files-widget-dropbox .progress-holder {
