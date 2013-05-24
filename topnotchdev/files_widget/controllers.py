@@ -128,18 +128,18 @@ class ImagePath(FilePath):
         key = hash(frozenset(all_attrs))
 
         if not key in self._thumbnails:
-            try:
-                thumbnail = get_thumbnail(self.local_path, size, **attrs)
-            except EnvironmentError:
-                return ''
-            self._thumbnails[key] = thumbnail
-        else:
-            thumbnail = self._thumbnails[key]
+            self._thumbnails[key] = get_thumbnail(self.local_path, size, **attrs)
 
-        return thumbnail
+        return self._thumbnails[key]
 
     def thumbnail_tag(self, size, opts={}, **kwargs):
-        thumbnail = self.thumbnail(size, **opts)
+        try:
+            thumbnail = self.thumbnail(size, **opts)
+        except EnvironmentError, e:
+            if settings.THUMBNAIL_DEBUG:
+                raise e
+            return ''
+
         src = ImagePath(thumbnail.url, self._instance, self._field)
         attrs = { 'width': thumbnail.width, 'height': thumbnail.height }
         attrs.update(self.settings['img_attrs'])
@@ -163,7 +163,7 @@ class FilePaths(unicode):
     item_class = FilePath
 
     def __new__(cls, str, instance, field, settings={}):
-        self = super(FilePaths, cls).__new__(cls, str)
+        self = super(FilePaths, cls).__new__(cls, str or '')
         self._instance = instance
         self._field = field
         self._all = None

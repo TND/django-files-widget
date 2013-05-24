@@ -96,7 +96,7 @@ $(function(){
                 filesize = numberformat(filesize / 1048576, 2, '.', '') + ' MB';
         } else { 
                 if (filesize >= 1024) {
-                filesize = numberformat(filesize / 1024, 0) + ' KB';
+                filesize = numberformat(filesize / 1024, 0) + ' kB';
             } else {
                 filesize = numberformat(filesize, 0) + 'B';
                 };

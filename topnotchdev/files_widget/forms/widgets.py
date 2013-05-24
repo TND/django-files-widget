@@ -12,6 +12,11 @@ def use_filebrowser():
             import filebrowser
             return True
         except:
+            try:
+                import filebrowser_safe
+                return True
+            except:
+                pass
             pass
     return False
 
