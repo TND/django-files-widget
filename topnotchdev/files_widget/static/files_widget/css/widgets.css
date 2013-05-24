@@ -46,6 +46,7 @@
 	border-radius: 3px;
 	background: white;
 	text-align: center;
+	overflow: hidden;
 }
 
 .files-widget-dropbox .image-holder {

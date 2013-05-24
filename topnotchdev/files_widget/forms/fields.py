@@ -36,7 +36,7 @@ class FilesFormField(forms.MultiValueField):
                 if self.required:
                     raise ValidationError(self.error_messages['required'])
                 else:
-                    return self.compress([])
+                    return self.compress(value)
         else:
             raise ValidationError(self.error_messages['invalid'])
         for i, field in enumerate(self.fields):

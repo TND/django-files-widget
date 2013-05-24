@@ -20,24 +20,24 @@ def model_slug(model):
 def construct_temp_path(user):
     now = time.localtime()[0:5]
     dir_name = TEMP_DIR_FORMAT % now
-    return '%s%s/%i/' % (TEMP_DIR, dir_name, user.pk)
+    return os.path.join(TEMP_DIR, dir_name, str(user.pk))
 
 def construct_permanent_path(instance):
     model_dir = model_slug(type(instance))
-    return '%s%s/%i/' % (FILES_DIR, model_dir, instance.pk)
+    return os.path.join(FILES_DIR, model_dir, str(instance.pk))
 
 def in_directory(path, directory):
     # don't try to manipulate with ../../
-    full_path = '%s%s' % (MEDIA_ROOT, path)
+    full_path = os.path.join(MEDIA_ROOT, path)
     return path.startswith(directory) and full_path == os.path.realpath(full_path)
 
 def in_permanent_directory(path, instance):
-    full_path = '%s%s' % (MEDIA_ROOT, path)
+    full_path = os.path.join(MEDIA_ROOT, path)
     return path.startswith(construct_permanent_path(instance)) and full_path == os.path.realpath(full_path)
 
 def make_temp_directory(filename, user):
     public_dir = construct_temp_path(user)
-    full_dir = '%s%s' % (settings.MEDIA_ROOT, public_dir)
+    full_dir = os.path.join(settings.MEDIA_ROOT, public_dir)
 
     try:
         if not os.path.exists(full_dir):
@@ -46,19 +46,19 @@ def make_temp_directory(filename, user):
         # deepest dir already exists
         pass
 
-    full_path = '%s%s' % (full_dir, filename)
+    full_path = os.path.join(full_dir, filename)
     available_full_path = default_storage.get_available_name(full_path)
     return available_full_path
 
 def make_permanent_directory(temp_path, instance):
     public_dir = construct_permanent_path(instance)
     filename = filename_from_path(temp_path)
-    full_dir = '%s%s' % (settings.MEDIA_ROOT, public_dir)
+    full_dir = os.path.join(settings.MEDIA_ROOT, public_dir)
 
     if not os.path.exists(full_dir):
         os.makedirs(full_dir)
 
-    full_path = '%s%s' % (full_dir, filename)
+    full_path = os.path.join(full_dir, filename)
     available_full_path = default_storage.get_available_name(full_path)
     return available_full_path
 
@@ -96,8 +96,8 @@ def save_upload(uploaded, filename, raw_data, user):
 def try_to_recover_path(temp_path, instance):
     filename = filename_from_path(temp_path)
     permanent_directory = construct_permanent_path(instance)
-    permanent_path = '%s%s' % (permanent_directory, filename)
-    full_path = '%s%s' % (settings.MEDIA_ROOT, permanent_path)
+    permanent_path = os.path.join(permanent_directory, filename)
+    full_path = os.path.join(settings.MEDIA_ROOT, permanent_path)
     if os.path.exists(full_path):
         return permanent_path, True
     else:
@@ -110,7 +110,7 @@ def move_to_permanent_directory(temp_path, instance):
 
     full_path = make_permanent_directory(temp_path, instance)
     public_path = full_path.replace(settings.MEDIA_ROOT, '', 1)
-    full_temp_path = '%s%s' % (settings.MEDIA_ROOT, temp_path)
+    full_temp_path = os.path.join(settings.MEDIA_ROOT, temp_path)
     try:
         os.link(full_temp_path, full_path)
     except EnvironmentError:
@@ -178,7 +178,7 @@ def manage_files_on_disk(sender, instance, **kwargs):
                 # --D & O-D
                 if in_permanent_directory(img, instance) or in_directory(img, TEMP_DIR):
                     try:
-                        os.remove('%s%s' % (settings.MEDIA_ROOT, img))
+                        os.remove(os.path.join(settings.MEDIA_ROOT, img))
                     except EnvironmentError as e:
                         pass
 

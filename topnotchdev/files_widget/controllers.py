@@ -45,13 +45,13 @@ class FilePath(unicode):
     @property
     def url(self):
         if not self.startswith('/') and self.find('//') == -1:
-            return '%s%s' % (settings.MEDIA_URL, self.escaped)
+            return os.path.join(settings.MEDIA_URL, self.escaped)
         return self.escaped
 
     @property
     def local_path(self):
         if not self.startswith('/') and self.find('//') == -1:
-            return u'%s%s' % (settings.MEDIA_ROOT, self)
+            return os.path.join(settings.MEDIA_ROOT, self)
         return self
 
     @property
@@ -163,7 +163,7 @@ class FilePaths(unicode):
     item_class = FilePath
 
     def __new__(cls, str, instance, field, settings={}):
-        self = super(FilePaths, cls).__new__(cls, str or '')
+        self = super(FilePaths, cls).__new__(cls, str)
         self._instance = instance
         self._field = field
         self._all = None
@@ -254,7 +254,7 @@ class FilesDescriptor(object):
                 % (self.field.name, owner.__name__))
 
         files = instance.__dict__[self.field.name]
-        if isinstance(files, six.string_types) and not isinstance(files, (FilePath, FilePaths, )) or files is None:
+        if isinstance(files, six.string_types) and not isinstance(files, (FilePath, FilePaths)):
             attr = self.field.attr_class(files, instance, self.field)
             instance.__dict__[self.field.name] = attr
 
