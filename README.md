@@ -60,7 +60,7 @@ Quick Start
         ...,
     )
     
-basic settings with their defaults:
+(Optional) basic settings with their defaults:
 
     FILES_WIDGET_TEMP_DIR            # 'temp/files_widget/'
     FILES_WIDGET_FILES_DIR           # 'uploads/files_widget/'
@@ -82,11 +82,13 @@ basic settings with their defaults:
         image = files_widget.ImageField()
         images = files_widget.ImagesField()
 
-### Django Auth user permissions ###
+### Django Auth User Permissions (optional) ###
 
     files_widget.can_upload_files
 
-### In Your Templates ###
+### Template Usage Examples ###
+
+No extra steps are required to use the widget in your Admin site. Here are some examples of displaying files and (thumbnail) images on your site:
 
 A list of linked thumbnails:
 
