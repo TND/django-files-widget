@@ -7,6 +7,23 @@ def read(fname):
     # file read function copied from sorl.django-documents project
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+install_requires = [
+    'sorl-thumbnail',
+]
+
+# PIL or pillow required
+# try except code copied from mezzanine project
+# https://github.com/stephenmcd/mezzanine/blob/master/setup.py
+try:
+    from PIL import Image, ImageOps
+except ImportError:
+    try:
+        import Image, ImageFile, ImageOps
+    except ImportError:
+        # no way to install pillow/PIL with jython, so exclude this in any case
+        if not sys.platform.startswith('java'):
+            install_requires += ["pillow"]
+
 setup(
     name='django-files-widget',
     version=version,
@@ -34,23 +51,8 @@ setup(
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     include_package_data=True,
     zip_safe=True,
-    install_requires=[
-        'sorl-thumbnail',
-    ],
+    install_requires=install_requires,
     entry_points="""
         # -*- Entry points: -*-
     """,
 )
-
-# PIL or pillow required
-# try except code copied from mezzanine project
-# https://github.com/stephenmcd/mezzanine/blob/master/setup.py
-try:
-    from PIL import Image, ImageOps
-except ImportError:
-    try:
-        import Image, ImageFile, ImageOps
-    except ImportError:
-        # no way to install pillow/PIL with jython, so exclude this in any case
-        if not sys.platform.startswith('java'):
-            install_requires += ["pillow"]
