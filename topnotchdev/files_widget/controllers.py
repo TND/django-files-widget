@@ -40,7 +40,7 @@ class FilePath(unicode):
 
     @property
     def escaped(self):
-        return urllib.unquote(self)
+        return urllib.quote(self)
 
     @property
     def url(self):
@@ -51,7 +51,7 @@ class FilePath(unicode):
     @property
     def local_path(self):
         if not self.startswith('/') and self.find('//') == -1:
-            return os.path.join(settings.MEDIA_ROOT, self)
+            return os.path.join(settings.MEDIA_ROOT, urllib.unquote(self))
         return self
 
     @property

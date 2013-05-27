@@ -190,7 +190,7 @@ $(function(){
         }
     }
 
-    function addPreview(dropbox, imagePath, thumbnailPath, file) {
+    function addPreview(dropbox, imagePath, thumbnailPath, file, fromHiddenInput) {
         var preview = $(template);
 
         if (dropbox.data('multiple') != 1) {
@@ -202,7 +202,7 @@ $(function(){
         dropbox.find('.message').hide();
         preview.hide().insertAfter(dropbox.children(':last-child')).fadeIn(effectTime);
         if (imagePath) {
-            completePreview(preview, imagePath, thumbnailPath);
+            completePreview(preview, imagePath, thumbnailPath, fromHiddenInput);
         } else if (file) {
             generateThumbnail(preview, file);
         }
@@ -210,7 +210,7 @@ $(function(){
         return preview;
     }
 
-    function completePreview(preview, imagePath, thumbnailPath) {
+    function completePreview(preview, imagePath, thumbnailPath, fromHiddenInput) {
         var dropbox = preview.closest('.files-widget-dropbox');
         
         preview.removeClass('new').attr('data-image-path', imagePath);
@@ -222,7 +222,9 @@ $(function(){
         } else {
             downloadThumbnail(preview);
         }
-        fillInHiddenInputs(dropbox);
+        if (!fromHiddenInput) {
+            fillInHiddenInputs(dropbox);
+        }
     }
 
     function onPreviewMove(preview, oldDropbox, newDropbox) {
@@ -315,8 +317,12 @@ $(function(){
             fileBrowserResultInput = $('.filebrowser-result', that),
             deletedContainer = $('.files-widget-deleted', that),
             deletedList = $('.deleted-list', deletedContainer),
-            stats = $('.upload-progress-stats', that);
+            stats = $('.upload-progress-stats', that),
+            hiddenInput = $('input[name="' + dropbox.data('input-name') + '_0"]'),
+            initialFileNames = splitlines(hiddenInput.val()),
+            name;
 
+        initialFiles = $('.preview', dropbox);
         if (initialFiles.length) {
             message.hide();
         }
