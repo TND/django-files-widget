@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import permission_required
 
 from files import save_upload
-
+from controllers import FilePath, ImagePath
 
 @permission_required('files_widget.can_upload_files')
 def upload(request):
@@ -55,10 +55,7 @@ def upload(request):
 @permission_required('files_widget.can_upload_files')
 def thumbnail_url(request):
     if not 'img' in request.GET or not 'preview_size' in request.GET:
-        return Http404
+        raise Http404
     
-    template_url = render_to_string('files_widget/includes/thumbnail.html', {
-        'path_to_file': request.GET['img'],
-        'preview_size': request.GET['preview_size'],
-    })
-    return HttpResponse(template_url)
+    thumbnail_url = ImagePath(request.GET['img']).thumbnail(request.GET['preview_size']).url
+    return HttpResponse(thumbnail_url)

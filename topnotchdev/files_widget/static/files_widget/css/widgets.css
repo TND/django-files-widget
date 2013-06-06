@@ -161,6 +161,10 @@
 	cursor: pointer;
 }
 
+.files-widget .controls input[type=text].add-by-url {
+	width: 300px;
+}
+
 .files-widget .controls .upload-progress-stats {
 	float: right;
 	display: block;

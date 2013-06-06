@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from models import IconSet, FileIcon
 from conf import *
 
 # currently not used
@@ -14,3 +15,7 @@ class MyModelAdmin(admin.ModelAdmin):
     def my_view(self, request):
         # custom view which should return an HttpResponse
         pass
+
+
+#admin.site.register(IconSet)
+#admin.site.register(FileIcon)

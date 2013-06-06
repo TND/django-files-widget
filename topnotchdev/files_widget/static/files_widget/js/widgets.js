@@ -157,7 +157,7 @@ $(function(){
             previewSize = dropbox.data('preview-size');
 
         $.get(thumbnailURL,
-                'img=' + imagePath + '&preview_size=' + previewSize,
+                'img=' + encodeURIComponent(imagePath) + '&preview_size=' + previewSize,
                 function(data) {
             preview.find('.thumbnail')
                 .css({ 'width': '', 'height': '' }).attr('src', data);;
@@ -322,6 +322,12 @@ $(function(){
             initialFileNames = splitlines(hiddenInput.val()),
             name;
 
+        for (name in initialFileNames) {
+            if (!initialFiles.filter('[data-image-path="' + initialFileNames[name] + '"]').length) {
+                addPreview(dropbox, initialFileNames[name], null, null, true);
+            }
+        }
+
         initialFiles = $('.preview', dropbox);
         if (initialFiles.length) {
             message.hide();
@@ -367,6 +373,34 @@ $(function(){
             var url = window.__filebrowser_url || '/admin/media-library/browse/'
             FileBrowser.show(fileBrowserResultInput.attr('id'), url + '?pop=1');
             checkFileBrowserResult();
+        });
+
+        $('.add-by-url-button', that).on('click', function() {
+            $('.add-by-url-container', that).show();
+            $(this).hide();
+            $('.add-by-url', that).trigger('focus');
+        });
+
+        $('.add-by-url', that).on('focusout', function() {
+            $('.add-by-url-button', that).show();
+            $('.add-by-url-container', that).hide();
+        }).on('keypress', function (e) {
+            var urlInput = $(this),
+                val = urlInput.val();
+
+            if (e.which == 13) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                $('.add-by-url-button', that).show();
+                $('.add-by-url-container', that).hide();
+                urlInput.val('');
+
+                if (val.length) {
+                    addPreview(dropbox, val);
+                }
+                return false;
+            }
         });
         
         dropbox.disableSelection();

@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Group, Permission
 
+from fields import ImageField
+
 
 class GlobalPermissionManager(models.Manager):
     def get_query_set(self):
@@ -29,3 +31,20 @@ permission = GlobalPermission.objects.get_or_create(
     codename='can_upload_files',
     name='Can Upload Files',
 )
+
+
+class IconSet(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    css_path = models.CharField(max_length=200, blank=True, null=True, help_text='Optional css file for icon styling')
+    active = models.BooleanField(default=True)
+    priority = models.IntegerField(default=1)
+    default_icon = models.ForeignKey('files_widget.FileIcon', null=True, blank=True)
+
+
+class FileIcon(models.Model):
+    icon_set = models.ForeignKey('files_widget.IconSet')
+    extension = models.CharField(max_length=100, blank=True, null=True)
+    image = ImageField()
+    display_text_overlay = models.BooleanField(default=True)
+    overlay_text = models.CharField(max_length=7, blank=True, null=True, help_text='Leave blank to display file extension')
+    base_color = models.CharField(max_length=12, blank=True, null=True)

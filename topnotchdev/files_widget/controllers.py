@@ -7,12 +7,15 @@ from django.conf import settings
 from django.utils import six
 from django.utils.safestring import mark_safe
 from django.utils.functional import curry
+from django.core.files.images import ImageFile
+from django.core.files.storage import get_storage_class
+from django.contrib.staticfiles import finders
 
 from sorl.thumbnail import get_thumbnail
 
 
 class FilePath(unicode):
-    def __new__(cls, str, instance, field, settings={}):
+    def __new__(cls, str, instance=None, field=None, settings={}):
         self = super(FilePath, cls).__new__(cls, str.strip())
         self._instance = instance
         self._field = field
@@ -40,7 +43,7 @@ class FilePath(unicode):
 
     @property
     def escaped(self):
-        return urllib.quote(self)
+        return urllib.quote(urllib.unquote(self))
 
     @property
     def url(self):
@@ -53,6 +56,24 @@ class FilePath(unicode):
         if not self.startswith('/') and self.find('//') == -1:
             return os.path.join(settings.MEDIA_ROOT, urllib.unquote(self))
         return self
+
+    def _get_local_path_or_file(self):
+        # if file is in static instead of media directory, sorl raises
+        # a suspicious operation error. So we open it safely without errors.
+
+        if self.startswith('/'):
+            if self.startswith('/static/'):
+                path = self.replace('/static/', '')
+            elif self.startswith(settings.STATIC_URL):
+                path = self.replace(settings.STATIC_URL, '')
+            else:
+                return self.local_path
+        else:
+            return self.local_path
+
+        path = finders.find(urllib.unquote(path))
+        image = ImageFile(open(path, 'r'))
+        return image
 
     @property
     def filename(self):
@@ -128,6 +149,7 @@ class ImagePath(FilePath):
         key = hash(frozenset(all_attrs))
 
         if not key in self._thumbnails:
+            #self._thumbnails[key] = get_thumbnail(self._get_local_path_or_file(), size, **attrs)
             self._thumbnails[key] = get_thumbnail(self.local_path, size, **attrs)
 
         return self._thumbnails[key]
@@ -162,7 +184,7 @@ class ImagePath(FilePath):
 class FilePaths(unicode):
     item_class = FilePath
 
-    def __new__(cls, str, instance, field, settings={}):
+    def __new__(cls, str, instance=None, field=None, settings={}):
         self = super(FilePaths, cls).__new__(cls, str)
         self._instance = instance
         self._field = field

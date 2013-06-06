@@ -36,6 +36,13 @@
             &nbsp;|&nbsp;
             <a href="javascript:void(0)" class="media-library-button">{% trans 'Library' %}</a>
         {% endif %}
+        {% if add_image_by_url %}
+            &nbsp;|&nbsp;
+            <a href="javascript:void(0)" class="add-by-url-button">{% trans 'Add by url...' %}</a>
+            <span class="add-by-url-container" style="display: none">
+                <input type="text" class="add-by-url" placeholder="{% trans 'Add by url...' %}" />
+            </span>
+        {% endif %}
         {{ input_string }}
         {# here comes the hacked mezzanine-filebrowser-safe integration #}
         <span class="hacked-filebrowser-integration" style="display: none !important;">

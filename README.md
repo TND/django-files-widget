@@ -9,11 +9,12 @@ Features
 --------
 
 - Drag &amp; drop file uploading via AJAX
+- Plus three other ways to add files: upload button, Django Filebrowser library, and by URL
 - Uploading multiple files at once
 - Upload progress bar
 - Four model fields with corresponding form fields and widgets: `ImagesField`, `ImageField`, `FilesField`, and `FileField`
 - Image gallery widget with drag &amp; drop reordering
-- File list widget with file type icons and metadata
+- Documents gallery widget with file type icons with drag &amp; drop reordering
 - Integrates with Django Admin, [Grappelli](https://github.com/sehmaschine/django-grappelli), [Django Filebrowser](https://github.com/sehmaschine/django-filebrowser) and [Mezzanine](http://mezzanine.jupo.org/)
 
 Screenshots
