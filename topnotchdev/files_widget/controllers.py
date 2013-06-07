@@ -42,8 +42,12 @@ class FilePath(unicode):
         return attrs
 
     @property
+    def unescaped(self):
+        return urllib.unquote(self)
+
+    @property
     def escaped(self):
-        return urllib.quote(urllib.unquote(self))
+        return urllib.quote(self.unescaped)
 
     @property
     def url(self):
