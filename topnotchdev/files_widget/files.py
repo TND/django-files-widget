@@ -63,9 +63,9 @@ def make_permanent_directory(temp_path, instance):
     return available_full_path
 
 def save_upload(uploaded, filename, raw_data, user):
-    ''' 
+    '''
     raw_data: if True, uploaded is an HttpRequest object with the file being
-    the raw post data 
+    the raw post data
     if False, uploaded has been submitted via the basic form
     submission and is a regular Django UploadedFile in request.FILES
     '''
@@ -75,13 +75,13 @@ def save_upload(uploaded, filename, raw_data, user):
 
     #try:
     with BufferedWriter(FileIO(path, "wb")) as dest:
-        # if the "advanced" upload, read directly from the HTTP request 
+        # if the "advanced" upload, read directly from the HTTP request
         # with the Django 1.3 functionality
         if raw_data:
             foo = uploaded.read(1024)
             while foo:
                 dest.write(foo)
-                foo = uploaded.read(1024) 
+                foo = uploaded.read(1024)
         # if not raw, it was a form upload so read in the normal Django chunks fashion
         else:
             for c in uploaded.chunks():
@@ -171,7 +171,7 @@ def manage_files_on_disk(sender, instance, **kwargs):
                 new_path, path_changed = move_to_permanent_directory(img, instance)
                 if path_changed:
                     changed = True
-            new_images.append(new_path)
+                    new_images.append(new_path)
 
         for img in deleted_images:
             if img not in current_images:
