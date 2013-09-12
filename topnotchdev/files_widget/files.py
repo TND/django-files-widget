@@ -127,8 +127,8 @@ def move_to_permanent_directory(temp_path, instance):
 def manage_files_on_disk(sender, instance, **kwargs):
     # Receiver of Django post_save signal.
     # At this point we know that the model instance has been saved into the db.
-    from fields import ImagesField
-    fields = [field for field in sender._meta.fields if type(field) == ImagesField]
+    from fields import ImagesField, ImageField
+    fields = [field for field in sender._meta.fields if type(field) in [ImagesField, ImageField]]
 
     for field in fields:
         old_value_attr = OLD_VALUE_STR % field.name
