@@ -179,7 +179,7 @@ def manage_files_on_disk(sender, instance, **kwargs):
                 new_path, path_changed = move_to_permanent_directory(img, instance)
                 if path_changed:
                     changed = True
-                    new_images.append(new_path)
+                new_images.append(new_path)
 
         for img in deleted_images:
             if img not in current_images:
