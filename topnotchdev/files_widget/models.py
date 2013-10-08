@@ -4,7 +4,6 @@ from django.contrib.auth.models import Group, Permission
 
 from fields import ImageField
 
-
 class GlobalPermissionManager(models.Manager):
     def get_query_set(self):
         return super(GlobalPermissionManager, self).\

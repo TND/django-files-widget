@@ -10,7 +10,6 @@ from django.template.defaultfilters import slugify
 
 from conf import *
 
-
 def filename_from_path(path):
     return re.sub(r'^.+/', '', path)
 
@@ -29,7 +28,7 @@ def construct_permanent_path(instance):
 def in_directory(path, directory):
     # don't try to manipulate with ../../
     full_path = os.path.join(MEDIA_ROOT, path)
-    return path.startswith(directory) and full_path == os.path.realpath(full_path)
+    return path.startswith(directory) and full_path == os.path.realpath(full_path)  
 
 def in_permanent_directory(path, instance):
     full_path = os.path.join(MEDIA_ROOT, path)
@@ -69,10 +68,18 @@ def save_upload(uploaded, filename, raw_data, user):
     if False, uploaded has been submitted via the basic form
     submission and is a regular Django UploadedFile in request.FILES
     '''
+    
+    from hashlib import md5
+    from time import time
+    import random
 
+    file_ext = os.path.splitext(filename)[1]
+    filename = "GISO_" + md5(str(time())+str(random.random()*1000)).hexdigest() + file_ext
+
+    
     path = make_temp_directory(filename, user)
-    public_path = path.replace(settings.MEDIA_ROOT, '', 1)
-
+    public_path = path.replace(settings.MEDIA_ROOT, "", 1)
+        
     #try:
     with BufferedWriter(FileIO(path, "wb")) as dest:
         # if the "advanced" upload, read directly from the HTTP request
@@ -104,12 +111,11 @@ def try_to_recover_path(temp_path, instance):
         return temp_path, False
 
 def move_to_permanent_directory(temp_path, instance):
-    if temp_path.startswith('/') or temp_path.find('//') != -1 \
-            or in_permanent_directory(temp_path, instance):
+    if temp_path.startswith('/') or temp_path.find('//') != -1 or in_permanent_directory(temp_path, instance):
         return temp_path, False
 
     full_path = make_permanent_directory(temp_path, instance)
-    public_path = full_path.replace(settings.MEDIA_ROOT, '', 1)
+    public_path = full_path.replace(settings.MEDIA_ROOT, "", 1)
     full_temp_path = os.path.join(settings.MEDIA_ROOT, temp_path)
     try:
         os.link(full_temp_path, full_path)
@@ -128,12 +134,14 @@ def manage_files_on_disk(sender, instance, **kwargs):
     # Receiver of Django post_save signal.
     # At this point we know that the model instance has been saved into the db.
     from fields import ImagesField, ImageField
+    
     fields = [field for field in sender._meta.fields if type(field) in [ImagesField, ImageField]]
-
+    
     for field in fields:
         old_value_attr = OLD_VALUE_STR % field.name
         deleted_value_attr = DELETED_VALUE_STR % field.name
         moved_value_attr = MOVED_VALUE_STR % field.name
+
         if not hasattr(instance, old_value_attr):
             continue
 
