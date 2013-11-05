@@ -1,7 +1,7 @@
 {% load i18n files_widget_tags %}
 
 <div class="files-widget">
-    <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}"  data-descriptions-enabled="{{ files_descriptions }}"  data-upload-url="{% url 'files_widget_upload' %}" data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}" data-static-url="{{ STATIC_URL }}" data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}" data-undo-text="{% trans 'undo' %}">
+    <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}"  data-descriptions-enabled="{{ descriptions_enabled }}"  data-upload-url="{% url 'files_widget_upload' %}" data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}" data-static-url="{{ STATIC_URL }}" data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}" data-undo-text="{% trans 'undo' %}">
         <span class="message">
             {% if multiple %}
                 {% trans 'Drop multiple images here to upload' %}
@@ -31,7 +31,7 @@
                     </span>
                 </span>
             </div>
-        {% endspaceless %}{% endfor %} 
+        {% endspaceless %}{% endfor %}
     </div>
     <div class="controls">
         <!--[if lt IE 9]>

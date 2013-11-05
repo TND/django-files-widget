@@ -9,7 +9,7 @@ $(function(){
         undoText = $('[data-undo-text]').data('undo-text'),
         deletedTemplate;
 
-
+		
     deletedTemplate =
         '<div class="deleted-file">'+
             '<span class="image-holder">'+
@@ -97,7 +97,7 @@ $(function(){
         files.each(function() {
             var path = $(this).data('image-path');
             if (path) {
-            	value += path + '\n';
+				value += path + '\n';
             }
         });
         input.val(value);
@@ -182,7 +182,7 @@ $(function(){
                     '<span class="buttons">';
         
         var descriptions_enabled = dropbox.data('descriptions-enabled');
-        if(descriptions_enabled) 
+        if(descriptions_enabled=="True") 
         {
         	template  += '<textarea  class="image-text"  name="images_descriptions_'+input_name+'"></textarea><br />'
         }
