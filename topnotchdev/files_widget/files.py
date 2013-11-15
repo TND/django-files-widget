@@ -74,8 +74,7 @@ def save_upload(uploaded, filename, raw_data, user):
     import random
 
     file_ext = os.path.splitext(filename)[1]
-    filename = "GISO_" + md5(str(time())+str(random.random()*1000)).hexdigest() + file_ext
-
+    filename = md5(str(time())+str(random.random()*1000)).hexdigest() + file_ext
     
     path = make_temp_directory(filename, user)
     public_path = path.replace(settings.MEDIA_ROOT, "", 1)
