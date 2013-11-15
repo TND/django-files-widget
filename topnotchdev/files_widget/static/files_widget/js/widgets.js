@@ -7,27 +7,9 @@ $(function(){
         staticURL = $('[data-static-url]').data('static-url'),
         thumbnailURL = $('[data-get-thumbnail-url]').data('get-thumbnail-url'),
         undoText = $('[data-undo-text]').data('undo-text'),
-        template,
         deletedTemplate;
 
-    template =
-        '<div class="new preview">'+
-            '<span class="image-holder">'+
-                '<img class="thumbnail" />'+
-                '<span class="buttons">'+
-                    '<a href="javascript:void(0)" class="enlarge-button">'+
-                        '<img src="'+ staticURL + 'files_widget/img/enlarge_button.png" />'+
-                    '</a> '+
-                    '<a href="javascript:void(0)" class="remove-button">'+
-                        '<img src="'+ staticURL + 'files_widget/img/close_button.png" />'+
-                    '</a>'+
-                '</span>'+
-            '</span>'+
-            '<div class="progress-holder">'+
-                '<div class="progress"></div>'+
-            '</div>'+
-        '</div>';
-
+		
     deletedTemplate =
         '<div class="deleted-file">'+
             '<span class="image-holder">'+
@@ -115,7 +97,7 @@ $(function(){
         files.each(function() {
             var path = $(this).data('image-path');
             if (path) {
-                value += path + '\n';
+				value += path + '\n';
             }
         });
         input.val(value);
@@ -191,7 +173,35 @@ $(function(){
     }
 
     function addPreview(dropbox, imagePath, thumbnailPath, file, fromHiddenInput) {
-        var preview = $(template);
+        var input_name = dropbox.data('input-name');
+    	
+        var  template =
+            '<div class="new preview">'+
+                '<span class="image-holder">'+
+                    '<img class="thumbnail" />'+
+                    '<span class="buttons">';
+        
+        var descriptions_enabled = dropbox.data('descriptions-enabled');
+        if(descriptions_enabled=="True") 
+        {
+        	template  += '<textarea  class="image-text"  name="images_descriptions_'+input_name+'"></textarea><br />'
+        }
+        
+        template += 
+                        '<a href="javascript:void(0)" class="enlarge-button">'+
+                            '<img src="'+ staticURL + 'files_widget/img/enlarge_button.png" />'+
+                        '</a> '+
+                        '<a href="javascript:void(0)" class="remove-button">'+
+                            '<img src="'+ staticURL + 'files_widget/img/close_button.png" />'+
+                        '</a>'+
+                    '</span>'+
+                '</span>'+
+                '<div class="progress-holder">'+
+                    '<div class="progress"></div>'+
+                '</div>'+
+            '</div>';
+    	
+    	var preview = $(template);
 
         if (dropbox.data('multiple') != 1) {
             dropbox.find('.preview').each(function() {
@@ -350,6 +360,10 @@ $(function(){
             window.open(mediaURL + $(this).closest('.preview').data('image-path'));
         });
 
+        dropbox.on('click', '.image-text', function() {
+        	this.focus();
+        });
+        
         function onFileBrowserResult() {
             var imagePath = stripMediaURL(fileBrowserResultInput.val()),
                 preview = addPreview(dropbox, imagePath);

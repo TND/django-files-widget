@@ -1,6 +1,7 @@
 {% load i18n files_widget_tags %}
+
 <div class="files-widget">
-    <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}" data-upload-url="{% url 'files_widget_upload' %}" data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}" data-static-url="{{ STATIC_URL }}" data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}" data-undo-text="{% trans 'undo' %}">
+    <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}"  data-descriptions-enabled="{{ descriptions_enabled }}"  data-upload-url="{% url 'files_widget_upload' %}" data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}" data-static-url="{{ STATIC_URL }}" data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}" data-undo-text="{% trans 'undo' %}">
         <span class="message">
             {% if multiple %}
                 {% trans 'Drop multiple images here to upload' %}
@@ -8,11 +9,19 @@
                 {% trans 'Drop an image here to upload' %}
             {% endif %}
         </span>
-        {% for path_to_file in files.splitlines %}{% spaceless %}
-            <div class="preview" data-image-path="{{ path_to_file }}">
+        {% for file in files_descriptions %}{% spaceless %}
+            <div class="preview" data-image-path='{{ file.1 }}'>
                 <span class="image-holder">
-                    <img class="thumbnail" src="{% include 'files_widget/includes/thumbnail.html' %}" />
+                    <img class="thumbnail" src="
+{% load thumbnail files_widget_tags %}
+{% thumbnail file.1|unquote preview_size|add:'x'|add:preview_size upscale=False format=path_to_file|thumbnail_format as thumb %}
+{{ thumb.url }}
+{% endthumbnail %}
+" />
                     <span class="buttons">
+                    	{% if descriptions_enabled %}
+                        <textarea  class="image-text"  name="images_descriptions_{{ name }}">{{file.0}}</textarea><br />
+                        {% endif %}
                         <a href="javascript:void(0)" class="enlarge-button">
                             <img src="{{ STATIC_URL }}files_widget/img/enlarge_button.png" />
                         </a>
@@ -74,4 +83,4 @@
             {% endfor %}
         </div>
     </div>
-</div>
+</div>   

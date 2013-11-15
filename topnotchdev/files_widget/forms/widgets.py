@@ -57,8 +57,22 @@ class BaseFilesWidget(forms.MultiWidget):
     def render(self, name, value, attrs=None):
         if not isinstance(value, list):
             value = self.decompress(value)
+        
         files, deleted_files, moved_files = value
-
+        
+        if hasattr(self, 'descriptions'):
+            descriptions_enabled = True;
+            descriptions = self.descriptions
+            if(descriptions == None):
+                descriptions = len(files.splitlines()) * [u'']
+            else:
+                descriptions= descriptions.splitlines()
+        else:
+            descriptions_enabled = False;
+            descriptions = len(files.splitlines()) * [u'']       
+            
+        files_descriptions = zip(descriptions,files.splitlines())
+        
         context = {
             'MEDIA_URL': settings.MEDIA_URL,
             'STATIC_URL': settings.STATIC_URL,
@@ -67,6 +81,8 @@ class BaseFilesWidget(forms.MultiWidget):
             'input_string': super(BaseFilesWidget, self).render(name, value, attrs),
             'name': name,
             'files': files,
+            'files_descriptions' : files_descriptions,
+            'descriptions_enabled' : descriptions_enabled,
             'deleted_files': deleted_files,
             'multiple': self.multiple and 1 or 0,
             'preview_size': unicode(self.preview_size),
