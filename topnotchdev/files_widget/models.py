@@ -27,10 +27,16 @@ class GlobalPermission(Permission):
         super(GlobalPermission, self).save(*args, **kwargs)
 
 
-permission = GlobalPermission.objects.get_or_create(
-    codename='can_upload_files',
-    name='Can Upload Files',
-)
+import django.db.utils
+try:
+    permission = GlobalPermission.objects.get_or_create(
+        codename='can_upload_files',
+        name='Can Upload Files',
+    )
+except django.db.utils.ProgrammingError:
+    # "Table 'fileswidgettest16.auth_permission' doesn't exist"
+    # it should exist the next time that this file is loaded
+    pass
 
 
 class IconSet(models.Model):
