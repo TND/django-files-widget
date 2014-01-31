@@ -53,7 +53,7 @@ def make_temp_directory(filename, user):
 def make_permanent_directory(temp_path, instance):
     public_dir = construct_permanent_path(instance)
     filename = filename_from_path(temp_path)
-    full_dir = os.path.join(settings.MEDIA_ROOT, public_dir)
+    full_dir = os.path.join(MEDIA_ROOT, public_dir)
 
     if not os.path.exists(full_dir):
         os.makedirs(full_dir)
@@ -97,7 +97,7 @@ def try_to_recover_path(temp_path, instance):
     filename = filename_from_path(temp_path)
     permanent_directory = construct_permanent_path(instance)
     permanent_path = os.path.join(permanent_directory, filename)
-    full_path = os.path.join(settings.MEDIA_ROOT, permanent_path)
+    full_path = os.path.join(MEDIA_ROOT, permanent_path)
     if os.path.exists(full_path):
         return permanent_path, True
     else:
@@ -109,8 +109,8 @@ def move_to_permanent_directory(temp_path, instance):
         return temp_path, False
 
     full_path = make_permanent_directory(temp_path, instance)
-    public_path = full_path.replace(settings.MEDIA_ROOT, '', 1)
-    full_temp_path = os.path.join(settings.MEDIA_ROOT, temp_path)
+    public_path = full_path.replace(MEDIA_ROOT, '', 1)
+    full_temp_path = os.path.join(MEDIA_ROOT, temp_path)
     try:
         os.link(full_temp_path, full_path)
     except EnvironmentError:
@@ -178,7 +178,7 @@ def manage_files_on_disk(sender, instance, **kwargs):
                 # --D & O-D
                 if in_permanent_directory(img, instance) or in_directory(img, TEMP_DIR):
                     try:
-                        os.remove(os.path.join(settings.MEDIA_ROOT, img))
+                        os.remove(os.path.join(MEDIA_ROOT, img))
                     except EnvironmentError as e:
                         pass
 

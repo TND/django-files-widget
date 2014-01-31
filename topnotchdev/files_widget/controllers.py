@@ -13,6 +13,8 @@ from django.contrib.staticfiles import finders
 
 from sorl.thumbnail import get_thumbnail
 
+from conf import *
+
 
 class FilePath(unicode):
     def __new__(cls, str, instance=None, field=None, settings={}):
@@ -52,13 +54,13 @@ class FilePath(unicode):
     @property
     def url(self):
         if not self.startswith('/') and self.find('//') == -1:
-            return os.path.join(settings.MEDIA_URL, self.escaped)
+            return os.path.join(MEDIA_URL, self.escaped)
         return self.escaped
 
     @property
     def local_path(self):
         if not self.startswith('/') and self.find('//') == -1:
-            return os.path.join(settings.MEDIA_ROOT, urllib.unquote(self))
+            return os.path.join(MEDIA_ROOT, urllib.unquote(self))
         return self
 
     def _get_local_path_or_file(self):
