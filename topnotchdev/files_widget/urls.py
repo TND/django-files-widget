@@ -1,7 +1,6 @@
-import django
-if float("%d.%d" % (django.VERSION[0], django.VERSION[1])) <= 1.5:
+try:
     from django.conf.urls.defaults import patterns, url
-else:
+except:
     from django.conf.urls import patterns, url
 
 from django.conf import settings
