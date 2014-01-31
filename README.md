@@ -61,6 +61,9 @@ Quick Start
         ...,
     )
     
+    MEDIA_URL = ...
+    MEDIA_ROOT = ...
+
 (Optional) basic settings with their defaults:
 
     FILES_WIDGET_TEMP_DIR            # 'temp/files_widget/'

@@ -71,7 +71,7 @@ def save_upload(uploaded, filename, raw_data, user):
     '''
 
     path = make_temp_directory(filename, user)
-    public_path = path.replace(settings.MEDIA_ROOT, '', 1)
+    public_path = path.replace(MEDIA_ROOT, '', 1)
 
     #try:
     with BufferedWriter(FileIO(path, "wb")) as dest:
