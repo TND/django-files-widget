@@ -63,7 +63,8 @@ Quick Start
     
     MEDIA_URL = ...
     MEDIA_ROOT = ...
-
+    THUMBNAIL_DEBUG = False
+    
 (Optional) basic settings with their defaults:
 
     FILES_WIDGET_TEMP_DIR            # 'temp/files_widget/'
@@ -72,8 +73,7 @@ Quick Start
     FILES_WIDGET_JQUERY_UI_PATH      # (jQuery UI 1.10.3 from Google)
     FILES_WIDGET_USE_FILEBROWSER     # False
     FILES_WIDGET_FILEBROWSER_JS_PATH # 'filebrowser/js/AddFileBrowser.js'
-    THUMBNAIL_DEBUG                  # False
-
+    
 ### In `urls.py` ###
 
     url(r'^files-widget/', include('topnotchdev.files_widget.urls')),
