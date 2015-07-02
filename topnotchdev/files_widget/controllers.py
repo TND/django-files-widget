@@ -163,7 +163,7 @@ class ImagePath(FilePath):
     def thumbnail_tag(self, size, opts={}, **kwargs):
         try:
             thumbnail = self.thumbnail(size, **opts)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             if settings.THUMBNAIL_DEBUG:
                 raise e
             return ''
