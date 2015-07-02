@@ -1,3 +1,4 @@
+from builtins import str
 import os, os.path
 from io import FileIO, BufferedWriter
 import re

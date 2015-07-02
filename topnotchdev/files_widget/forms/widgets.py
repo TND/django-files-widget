@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 from django import forms
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -69,7 +71,7 @@ class BaseFilesWidget(forms.MultiWidget):
             'files': files,
             'deleted_files': deleted_files,
             'multiple': self.multiple and 1 or 0,
-            'preview_size': unicode(self.preview_size),
+            'preview_size': str(self.preview_size),
         }
         return render_to_string(self.template, context)
 

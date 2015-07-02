@@ -1,5 +1,7 @@
+from future import standard_library
+standard_library.install_aliases()
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django import template
 
@@ -22,4 +24,4 @@ def filename_from_path(path):
 @register.filter
 def unquote(value):
     "urldecode"
-    return urllib.unquote(value)
+    return urllib.parse.unquote(value)
