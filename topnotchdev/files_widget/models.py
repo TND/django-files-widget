@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Group, Permission
 
-from fields import ImageField
+from .fields import ImageField
 
 
 class GlobalPermissionManager(models.Manager):

@@ -13,7 +13,7 @@ from django.contrib.staticfiles import finders
 
 from sorl.thumbnail import get_thumbnail
 
-from conf import *
+from .conf import *
 
 
 class FilePath(unicode):
