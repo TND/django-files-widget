@@ -7,10 +7,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from forms import FilesFormField, BaseFilesWidget, FileWidget, FilesWidget, ImageWidget, ImagesWidget
-from files import manage_files_on_disk
-import controllers
-from conf import *
+from .forms import FilesFormField, BaseFilesWidget, FileWidget, FilesWidget, ImageWidget, ImagesWidget
+from .files import manage_files_on_disk
+from . import controllers
+from .conf import *
 
 
 def formfield_defaults(self, default_widget=None, widget=None, form_class=FilesFormField, required=True, **kwargs):

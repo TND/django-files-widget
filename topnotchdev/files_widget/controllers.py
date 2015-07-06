@@ -1,5 +1,8 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import os, os.path
 from datetime import datetime
 
@@ -13,10 +16,10 @@ from django.contrib.staticfiles import finders
 
 from sorl.thumbnail import get_thumbnail
 
-from conf import *
+from .conf import *
 
 
-class FilePath(unicode):
+class FilePath(str):
     def __new__(cls, str, instance=None, field=None, settings={}):
         self = super(FilePath, cls).__new__(cls, str.strip())
         self._instance = instance
@@ -45,11 +48,11 @@ class FilePath(unicode):
 
     @property
     def unescaped(self):
-        return urllib.unquote(self)
+        return urllib.parse.unquote(self)
 
     @property
     def escaped(self):
-        return urllib.quote(self.unescaped)
+        return urllib.parse.quote(self.unescaped)
 
     @property
     def url(self):
@@ -60,7 +63,7 @@ class FilePath(unicode):
     @property
     def local_path(self):
         if not self.startswith('/') and self.find('//') == -1:
-            return os.path.join(MEDIA_ROOT, urllib.unquote(self))
+            return os.path.join(MEDIA_ROOT, urllib.parse.unquote(self))
         return self
 
     def _get_local_path_or_file(self):
@@ -77,13 +80,13 @@ class FilePath(unicode):
         else:
             return self.local_path
 
-        path = finders.find(urllib.unquote(path))
+        path = finders.find(urllib.parse.unquote(path))
         image = ImageFile(open(path, 'r'))
         return image
 
     @property
     def filename(self):
-        return urllib.unquote(re.sub(r'^.+\/', '', self))
+        return urllib.parse.unquote(re.sub(r'^.+\/', '', self))
 
     @property
     def display_name(self):
@@ -163,7 +166,7 @@ class ImagePath(FilePath):
     def thumbnail_tag(self, size, opts={}, **kwargs):
         try:
             thumbnail = self.thumbnail(size, **opts)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             if settings.THUMBNAIL_DEBUG:
                 raise e
             return ''
@@ -187,7 +190,7 @@ class ImagePath(FilePath):
         raise AttributeError
 
 
-class FilePaths(unicode):
+class FilePaths(str):
     item_class = FilePath
 
     def __new__(cls, str, instance=None, field=None, settings={}):

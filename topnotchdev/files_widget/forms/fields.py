@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from topnotchdev.files_widget.conf import *
 
 
-class UnicodeWithAttr(unicode):
+class UnicodeWithAttr(str):
     deleted_files = None
     moved_files = None
 

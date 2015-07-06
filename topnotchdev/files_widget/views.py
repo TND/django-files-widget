@@ -5,9 +5,10 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import permission_required
+from django.utils import six
 
-from files import save_upload
-from controllers import FilePath, ImagePath
+from .files import save_upload
+from .controllers import FilePath, ImagePath
 
 @permission_required('files_widget.can_upload_files')
 def upload(request):
@@ -30,7 +31,8 @@ def upload(request):
     # else:
     is_raw = False
     if len(request.FILES) == 1:
-        upload = request.FILES.values()[0]
+        values = request.FILES.values()
+        upload = next(values) if six.PY3 else values[0]
     else:
         return HttpResponseBadRequest(json.dumps({
             'success': False,
