@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Group, Permission
 
-from fields import ImageField
+from .fields import ImageField
 
 
 class GlobalPermissionManager(models.Manager):
@@ -43,11 +43,11 @@ class IconSet(models.Model):
     css_path = models.CharField(max_length=200, blank=True, null=True, help_text='Optional css file for icon styling')
     active = models.BooleanField(default=True)
     priority = models.IntegerField(default=1)
-    default_icon = models.ForeignKey('files_widget.FileIcon', null=True, blank=True)
+    default_icon = models.ForeignKey('files_widget.FileIcon', null=True, blank=True, on_delete=models.SET_NULL)
 
 
 class FileIcon(models.Model):
-    icon_set = models.ForeignKey('files_widget.IconSet')
+    icon_set = models.ForeignKey('files_widget.IconSet', on_delete=models.CASCADE)
     extension = models.CharField(max_length=100, blank=True, null=True)
     image = ImageField()
     display_text_overlay = models.BooleanField(default=True)

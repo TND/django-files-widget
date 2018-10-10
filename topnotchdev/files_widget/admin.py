@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from models import IconSet, FileIcon
-from conf import *
+from .models import IconSet, FileIcon
+from .conf import *
 
 # currently not used
 class MyModelAdmin(admin.ModelAdmin):
