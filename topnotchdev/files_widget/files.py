@@ -8,7 +8,7 @@ from django.core.files.storage import default_storage
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
 
-from conf import *
+from .conf import *
 
 
 def filename_from_path(path):
@@ -127,7 +127,7 @@ def move_to_permanent_directory(temp_path, instance):
 def manage_files_on_disk(sender, instance, **kwargs):
     # Receiver of Django post_save signal.
     # At this point we know that the model instance has been saved into the db.
-    from fields import ImagesField, ImageField
+    from .fields import ImagesField, ImageField
     fields = [field for field in sender._meta.fields if type(field) in [ImagesField, ImageField]]
 
     for field in fields:

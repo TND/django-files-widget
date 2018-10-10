@@ -279,7 +279,7 @@ $(function(){
 
     function undoDeletePreview(deletedPreview) {
         var imagePath = deletedPreview.data('image-path'),
-            thumbnailPath = $('.icon', deletedPreview).attr('stc'),
+            thumbnailPath = $('.icon', deletedPreview).attr('src'),
             widget = deletedPreview.closest('.files-widget'),
             dropbox = widget.find('.files-widget-dropbox'),
             deletedContainer = $('.files-widget-deleted', widget),

@@ -6,8 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import permission_required
 
-from files import save_upload
-from controllers import FilePath, ImagePath
+from .files import save_upload
+from .controllers import FilePath, ImagePath
 
 @permission_required('files_widget.can_upload_files')
 def upload(request):
@@ -29,9 +29,9 @@ def upload(request):
     # not an ajax upload, so it was the "basic" iframe version with submission via form
     # else:
     is_raw = False
-    if len(request.FILES) == 1:
-        upload = request.FILES.values()[0]
-    else:
+    try:
+        upload = next(iter(request.FILES.values()))
+    except StopIteration:
         return HttpResponseBadRequest(json.dumps({
             'success': False,
             'message': 'Error while uploading file.',

@@ -1,5 +1,5 @@
 import re
-import urllib
+from six.moves import urllib
 
 from django import template
 
@@ -22,4 +22,4 @@ def filename_from_path(path):
 @register.filter
 def unquote(value):
     "urldecode"
-    return urllib.unquote(value)
+    return urllib.parse.unquote(value)

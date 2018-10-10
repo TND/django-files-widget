@@ -1,11 +1,12 @@
 from django import forms
 from django.core import exceptions, validators
 from django.utils.translation import ugettext_lazy as _
+import six
 
 from topnotchdev.files_widget.conf import *
 
 
-class UnicodeWithAttr(unicode):
+class UnicodeWithAttr(six.text_type):
     deleted_files = None
     moved_files = None
 
@@ -25,8 +26,7 @@ class FilesFormField(forms.MultiValueField):
         -   if self.required and field_value in validators.EMPTY_VALUES:
         +   if field.required and field_value in validators.EMPTY_VALUES:
         """
-        from django.forms.util import ErrorList
-        from django.core import validators
+        from django.forms.utils import ErrorList
         from django.core.exceptions import ValidationError
 
         clean_data = []

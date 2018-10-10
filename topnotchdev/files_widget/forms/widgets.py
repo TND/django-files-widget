@@ -1,6 +1,5 @@
 from django import forms
 from django.conf import settings
-from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 from topnotchdev.files_widget.conf import *
@@ -20,12 +19,15 @@ def use_filebrowser():
             pass
     return False
 
+TO_HIDE_ATTRS = {'class': 'hidden'}
 class BaseFilesWidget(forms.MultiWidget):
     def __init__(self,
             multiple=False,
             preview_size=150,
             template="files_widget/files_widget.html",
-            widgets=(forms.HiddenInput, forms.HiddenInput, forms.HiddenInput, ),
+            widgets=(forms.HiddenInput,
+                     forms.HiddenInput,
+                     forms.HiddenInput),
             **kwargs):
         super(BaseFilesWidget, self).__init__(widgets, **kwargs)
         self.multiple = multiple
@@ -49,12 +51,16 @@ class BaseFilesWidget(forms.MultiWidget):
             ),
         }
 
+    @property
+    def is_hidden(self):
+        return False
+
     def decompress(self, value):
         if value:
             return [value, '', '', ]
         return ['', '', '', ]
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if not isinstance(value, list):
             value = self.decompress(value)
         files, deleted_files, moved_files = value
@@ -64,14 +70,14 @@ class BaseFilesWidget(forms.MultiWidget):
             'STATIC_URL': settings.STATIC_URL,
             'use_filebrowser': use_filebrowser(),
             'add_image_by_url': ADD_IMAGE_BY_URL,
-            'input_string': super(BaseFilesWidget, self).render(name, value, attrs),
+            'input_string': super(BaseFilesWidget, self).render(name, value, attrs, renderer),
             'name': name,
             'files': files,
             'deleted_files': deleted_files,
             'multiple': self.multiple and 1 or 0,
-            'preview_size': unicode(self.preview_size),
+            'preview_size': str(self.preview_size),
         }
-        return render_to_string(self.template, context)
+        return renderer.render(self.template, context)
 
 
 class FileWidget(BaseFilesWidget):

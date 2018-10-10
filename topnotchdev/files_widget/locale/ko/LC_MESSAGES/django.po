@@ -1,0 +1,64 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-10-10 08:53+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: files_widget/fields.py:39
+msgid "File"
+msgstr ""
+
+#: files_widget/fields.py:60
+msgid "Files"
+msgstr ""
+
+#: files_widget/fields.py:78
+msgid "Image"
+msgstr ""
+
+#: files_widget/fields.py:87
+msgid "Images"
+msgstr ""
+
+#: files_widget/templates/files_widget/files_widget.html:3
+msgid "undo"
+msgstr ""
+
+#: files_widget/templates/files_widget/files_widget.html:6
+msgid "Drop multiple images here to upload"
+msgstr ""
+
+#: files_widget/templates/files_widget/files_widget.html:8
+msgid "Drop an image here to upload"
+msgstr ""
+
+#: files_widget/templates/files_widget/files_widget.html:32
+msgid "Upload"
+msgstr ""
+
+#: files_widget/templates/files_widget/files_widget.html:37
+msgid "Library"
+msgstr ""
+
+#: files_widget/templates/files_widget/files_widget.html:41
+#: files_widget/templates/files_widget/files_widget.html:43
+msgid "Add by url..."
+msgstr ""
+
+#: files_widget/templates/files_widget/files_widget.html:60
+msgid "Images to be removed"
+msgstr ""
