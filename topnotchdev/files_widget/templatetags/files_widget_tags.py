@@ -1,5 +1,5 @@
 import re
-from six.moves import urllib
+from django.utils.six.moves import urllib
 
 from django import template
 
