@@ -39,8 +39,10 @@ class FileField(models.CharField):
     description = _("File")
     attr_class = controllers.FilePath
 
-    def __init__(self, max_length=200, **kwargs):
-        super(FileField, self).__init__(max_length=max_length, **kwargs)
+    def __init__(self, *args, **kwargs):
+        if 'max_length' not in kwargs:
+            kwargs['max_length'] = 200
+        super(FileField, self).__init__(*args, **kwargs)
 
     def contribute_to_class(self, cls, name):
         super(FileField, self).contribute_to_class(cls, name)

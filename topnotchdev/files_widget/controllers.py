@@ -1,5 +1,5 @@
 import re
-from six.moves import urllib
+from django.utils.six.moves import urllib
 import os, os.path
 from datetime import datetime
 
@@ -12,7 +12,6 @@ from django.core.files.storage import get_storage_class
 from django.contrib.staticfiles import finders
 
 from sorl.thumbnail import get_thumbnail
-import six
 
 from .conf import *
 
@@ -278,9 +277,7 @@ class FilesDescriptor(object):
 
     def __get__(self, instance=None, owner=None):
         if instance is None:
-            raise AttributeError(
-                "The '%s' attribute can only be accessed from %s instances."
-                % (self.field.name, owner.__name__))
+            return self
 
         files = instance.__dict__[self.field.name]
         if isinstance(files, six.string_types) and not isinstance(files, (FilePath, FilePaths)):
