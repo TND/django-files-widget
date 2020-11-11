@@ -1,7 +1,7 @@
 from django import forms
 from django.core import exceptions, validators
 from django.utils.translation import ugettext_lazy as _
-from django.utils import six
+import six
 
 from topnotchdev.files_widget.conf import *
 

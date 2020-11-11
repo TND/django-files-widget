@@ -1,12 +1,14 @@
 import re
-from django.utils.six.moves import urllib
+from six.moves import urllib
 import os, os.path
 from datetime import datetime
 
 from django.conf import settings
-from django.utils import six
+import six
 from django.utils.safestring import mark_safe
-from django.utils.functional import curry
+
+from .utils import curry
+
 from django.core.files.images import ImageFile
 from django.core.files.storage import get_storage_class
 from django.contrib.staticfiles import finders
