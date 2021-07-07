@@ -1,7 +1,4 @@
 from django import forms
-from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
-
 from topnotchdev.files_widget.conf import *
 
 
@@ -19,7 +16,34 @@ def use_filebrowser():
             pass
     return False
 
+
+def get_widget_js():
+    js = [
+                JQUERY_PATH,
+                JQUERY_UI_PATH,
+                'files_widget/js/jquery.iframe-transport.js',
+                'files_widget/js/jquery.fileupload.js',
+                'files_widget/js/widgets.js',
+    ] + WIDGET_EXTRA_JS
+
+    if use_filebrowser():
+        js.append(FILEBROWSER_JS_PATH)
+
+    return [_js for _js in js if _js]
+
+
+def get_widget_css():
+    css = ['files_widget/css/widgets.css'] + WIDGET_EXTRA_CSS
+    css = [_c for _c in css if _c]
+
+    return {
+        'all': tuple(css),
+    }
+
+
 TO_HIDE_ATTRS = {'class': 'hidden'}
+
+
 class BaseFilesWidget(forms.MultiWidget):
     def __init__(self,
             multiple=False,
@@ -35,21 +59,8 @@ class BaseFilesWidget(forms.MultiWidget):
         self.template = template
 
     class Media:
-        js = [
-            JQUERY_PATH,
-            JQUERY_UI_PATH,
-            'files_widget/js/jquery.iframe-transport.js',
-            'files_widget/js/jquery.fileupload.js',
-            'files_widget/js/widgets.js',
-        ]
-        if use_filebrowser():
-            js.append(FILEBROWSER_JS_PATH)
-
-        css = {
-            'all': (
-                'files_widget/css/widgets.css',
-            ),
-        }
+        js = get_widget_js()
+        css = get_widget_css()
 
     @property
     def is_hidden(self):

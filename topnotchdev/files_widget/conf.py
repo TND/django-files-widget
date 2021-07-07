@@ -18,6 +18,9 @@ MAX_FILESIZE = getattr(settings, 'FILES_WIDGET_MAX_FILESIZE', 0)
 FILE_TYPES = getattr(settings, 'FILES_WIDGET_FILE_TYPES', None)
 USE_TRASH = getattr(settings, 'FILES_WIDGET_USE_TRASH', False)
 TRASH_DIR = getattr(settings, 'FILES_WIDGET_TRASH_DIR', 'uploads/trash/files_widget/')
+WIDGET_EXTRA_JS = getattr(settings, 'FILES_WIDGET_EXTRA_JS', [])
+WIDGET_EXTRA_CSS = getattr(settings, 'FILES_WIDGET_EXTRA_CSS', [])
+
 
 # Since Django version 3.X, default BASE_DIR is a Path object
 MEDIA_ROOT = str(MEDIA_ROOT)
