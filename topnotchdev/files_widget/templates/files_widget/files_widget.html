@@ -1,6 +1,10 @@
 {% load i18n files_widget_tags static %}
 <div class="files-widget">
-    <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}" data-upload-url="{% url 'files_widget_upload' %}" data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}" data-static-url="{{ STATIC_URL }}" data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}" data-undo-text="{% trans 'undo' %}">
+    <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}"
+         data-upload-url="{% url 'files_widget_upload' %}"
+         data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}"
+         data-static-url="{{ STATIC_URL }}" data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}"
+         data-undo-text="{% trans 'undo' %}">
         <span class="message">
             {% if multiple %}
                 {% trans 'Drop multiple images here to upload' %}
@@ -9,36 +13,41 @@
             {% endif %}
         </span>
     </div>
+
+    {{ input_string }}
+
+    {% if not uploader_disabled %}
     <div class="controls">
         <!--[if lt IE 9]>
-            <script src="{% static 'js/html5shiv.min.js' %}"></script>
+        <script src="{% static 'files_widget/js/html5shiv.min.js' %}"></script>
         <![endif]-->
         <a href="javascript:void(0)" class="fake-files-input">
             <span>{% trans 'Upload' %}...</span>
-            <input type="file" class="files-input" id="{{ name }}-files" multiple="mulitple" />
+            <input type="file" class="files-input" id="{{ name }}-files" multiple="mulitple"/>
         </a>
+
         {% if use_filebrowser %}
             &nbsp;|&nbsp;
             <a href="javascript:void(0)" class="media-library-button">{% trans 'Library' %}</a>
         {% endif %}
+
         {% if add_image_by_url %}
-            &nbsp;|&nbsp;
-            <a href="javascript:void(0)" class="add-by-url-button">{% trans 'Add by url...' %}</a>
-            <span class="add-by-url-container" style="display: none">
-                <input type="text" class="add-by-url" placeholder="{% trans 'Add by url...' %}" />
-            </span>
+        &nbsp;|&nbsp;
+        <a href="javascript:void(0)" class="add-by-url-button">{% trans 'Add by url...' %}</a>
+        <span class="add-by-url-container" style="display: none">
+            <input type="text" class="add-by-url" placeholder="{% trans 'Add by url...' %}"/>
+        </span>
         {% endif %}
-        {{ input_string }}
         {# here comes the hacked mezzanine-filebrowser-safe integration #}
         <span class="hacked-filebrowser-integration" style="display: none !important;">
-            <input type="hidden" id="{{ name }}-filebrowser-result" class="filebrowser-result" />
-            <img id="image_{{ name }}-filebrowser-result" />
-            <a id="link_{{ name }}-filebrowser-result"></a>
-            <img id="previewimage_{{ name }}-filebrowser-result" />
-            <a id="previewlink_{{ name }}-filebrowser-result"></a>
-            <span id="help_{{ name }}-filebrowser-result"></span>
-            <span id="preview_{{ name }}-filebrowser-result"></span>
-        </span>
+                <input type="hidden" id="{{ name }}-filebrowser-result" class="filebrowser-result"/>
+                <img id="image_{{ name }}-filebrowser-result"/>
+                <a id="link_{{ name }}-filebrowser-result"></a>
+                <img id="previewimage_{{ name }}-filebrowser-result"/>
+                <a id="previewlink_{{ name }}-filebrowser-result"></a>
+                <span id="help_{{ name }}-filebrowser-result"></span>
+                <span id="preview_{{ name }}-filebrowser-result"></span>
+            </span>
         <span class="upload-progress-stats"></span>
     </div>
     <div class="files-widget-deleted" style="display: none">
@@ -46,4 +55,5 @@
         <div class="deleted-list">
         </div>
     </div>
+    {% endif %}
 </div>

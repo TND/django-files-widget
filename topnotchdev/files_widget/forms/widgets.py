@@ -77,6 +77,13 @@ class BaseFilesWidget(forms.MultiWidget):
             'multiple': self.multiple and 1 or 0,
             'preview_size': str(self.preview_size),
         }
+
+        _context = self.get_context(name, value, attrs)
+
+        if (_context["widget"]["attrs"].get("disabled", False)
+                or _context["widget"]["attrs"].get("readonly") == "readonly"):
+            context["uploader_disabled"] = True
+
         return renderer.render(self.template, context)
 
 

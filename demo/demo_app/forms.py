@@ -14,4 +14,9 @@ class DemoImagesForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper(self)
+
+        # Uncomment respectively to see result (drag and drop, sorting, input button)
+        # self.fields["images"].disabled = True
+        self.fields["images"].widget.attrs['readonly'] = "readonly"
+
         self.helper.layout.append(Submit("Submit", "submit"))
