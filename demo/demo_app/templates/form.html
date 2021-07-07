@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+{% comment %}
+Fixme: Here we cannot add form.media, otherwise it will result in duplicated rendering.
+    {{ form.media }}
+{% endcomment %}
+    {% crispy form %}
+{% endblock %}

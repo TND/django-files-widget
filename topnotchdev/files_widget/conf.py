@@ -19,6 +19,9 @@ FILE_TYPES = getattr(settings, 'FILES_WIDGET_FILE_TYPES', None)
 USE_TRASH = getattr(settings, 'FILES_WIDGET_USE_TRASH', False)
 TRASH_DIR = getattr(settings, 'FILES_WIDGET_TRASH_DIR', 'uploads/trash/files_widget/')
 
+# Since Django version 3.X, default BASE_DIR is a Path object
+MEDIA_ROOT = str(MEDIA_ROOT)
+
 if not len(MEDIA_URL) or not len(MEDIA_ROOT) or not len(TEMP_DIR) or not len(FILES_DIR):
     raise ImproperlyConfigured('MEDIA_URL, MEDIA_ROOT, FILES_WIDGET_TEMP_DIR and FILES_WIDGET_FILES_DIR must not be empty')
 if TEMP_DIR == FILES_DIR:

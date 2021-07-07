@@ -123,6 +123,19 @@ Or other attributes:
     {{ my_instance.image.thumbnail_64x64.url }}
     ...
 
+### Run the demo ###
+    git clone https://github.com/TND/django-files-widget.git
+    cd django-files-widget
+    cd demo
+    pip install -r requirements.txt
+    cd ..
+    python manage.py migrate
+    python manage.py createsuperuser # Create a superuser account so that you can upload images
+    python manage.py runserver
+
+Then in your browser navigate to http://127.0.0.1:8000/admin and login, then return to http://127.0.0.1:8000/.
+
+
 License
 -------
 
