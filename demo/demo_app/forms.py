@@ -17,7 +17,7 @@ class DemoImagesForm(forms.ModelForm):
 
         # Uncomment respectively to see result (drag and drop, sorting, input button)
         # self.fields["images"].disabled = True
-        self.fields["images"].widget.attrs['readonly'] = "readonly"
+        # self.fields["images"].widget.attrs['readonly'] = "readonly"
 
         self.helper.layout.append(Submit("Submit", "submit"))
 
@@ -33,7 +33,9 @@ class DemoImagesTwoImageFieldsForm(forms.ModelForm):
         self.helper = FormHelper(self)
 
         # Uncomment respectively to see result (drag and drop, sorting, input button)
+
         # self.fields["scene"].disabled = True
-        self.fields["avatar"].widget.attrs['readonly'] = "readonly"
+        self.fields["avatar"].widget.template = "demo_app/my_image_widget_template.html"
+        # self.fields["avatar"].widget.attrs['readonly'] = "readonly"
 
         self.helper.layout.append(Submit("Submit", "submit"))

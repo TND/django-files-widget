@@ -79,32 +79,10 @@ $(function () {
             inputDisabled = isInputDisabled(hiddenInput),
             initialFileNames = splitlines(hiddenInput.val()),
             mediaURL = dropbox.data('media-url'),
-            staticURL = dropbox.data('static-url'),
             thumbnailURL = dropbox.data('get-thumbnail-url'),
             initialFiles = $('.preview', dropbox),
             previewSize = dropbox.data('preview-size'),
-            message = $('.message', dropbox),
-            removeButtonHtml="",
-            previewTemplate;
-
-        if(!inputDisabled)
-            removeButtonHtml =
-                '<a href="javascript:void(0)" class="remove-button">' +
-                '<img src="' + staticURL + 'files_widget/img/close_button.png" />' +
-                '</a>';
-
-        previewTemplate =
-            '<div class="new preview">' +
-                '<span class="image-holder">' +
-                    '<img class="thumbnail" />' +
-                    '<span class="buttons">' +
-                        '<a href="javascript:void(0)" class="enlarge-button">' +
-                            '<img src="' + staticURL + 'files_widget/img/enlarge_button.png" />' +
-                        '</a> ' + removeButtonHtml +
-                    '</span>' +
-                '</span>' +
-                '<div class="progress-holder"><div class="progress"></div></div>' +
-            '</div>';
+            message = $('.message', dropbox);
 
         dropbox.on('click', '.enlarge-button', function () {
             window.open(mediaURL + $(this).closest('.preview').data('image-path'));
@@ -143,23 +121,7 @@ $(function () {
             fileBrowserResultInput = $('.filebrowser-result', that),
             deletedContainer = $('.files-widget-deleted', that),
             deletedList = $('.deleted-list', deletedContainer),
-            stats = $('.upload-progress-stats', that),
-            undoText = $('[data-undo-text]', that).data('undo-text'),
-
-            deletedTemplate;
-
-        deletedTemplate =
-            '<div class="deleted-file">' +
-                '<span class="image-holder">' +
-                    '<img class="icon" />' +
-                '</span>' +
-                '<span class="name"></span>' +
-                '<span class="undo">' +
-                    '<a href="javascript:void(0);" class="undo-remove-button">' +
-                    undoText +
-                    '</a>' +
-                '</span>' +
-            '</div>';
+            stats = $('.upload-progress-stats', that);
 
         if (deletedList.find('.deleted-file').length) {
             deletedContainer.show();
