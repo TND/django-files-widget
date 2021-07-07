@@ -260,13 +260,13 @@ $(function(){
             $('.name', deletedPreview).text(filenameFromPath(path));
             deletedPreview.attr('data-image-path', path);
             deletedContainer.show();
-            deletedPreview.hide().appendTo(deletedList)
+            deletedPreview.hide().appendTo(deletedList);
             deletedPreview.slideDown(effectTime);
             preview.remove();
 
             if (!dropbox.find('.preview').length && !changingToNewPreview) {
                 dropbox.find('.message').show();
-            };
+            }
             fillInHiddenInputs(dropbox);
         }
 
@@ -290,7 +290,7 @@ $(function(){
             $(this).remove();
             if (!deletedList.find('.deleted-file').length) {
                 deletedContainer.hide();
-            };
+            }
             fillInHiddenInputs(dropbox);
         });
     }

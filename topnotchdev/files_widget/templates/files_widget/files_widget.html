@@ -1,4 +1,4 @@
-{% load i18n files_widget_tags %}
+{% load i18n files_widget_tags static %}
 <div class="files-widget">
     <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}" data-upload-url="{% url 'files_widget_upload' %}" data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}" data-static-url="{{ STATIC_URL }}" data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}" data-undo-text="{% trans 'undo' %}">
         <span class="message">
@@ -8,25 +8,10 @@
                 {% trans 'Drop an image here to upload' %}
             {% endif %}
         </span>
-        {% for path_to_file in files.splitlines %}{% spaceless %}
-            <div class="preview" data-image-path="{{ path_to_file }}">
-                <span class="image-holder">
-                    <img class="thumbnail" src="{% include 'files_widget/includes/thumbnail.html' %}" />
-                    <span class="buttons">
-                        <a href="javascript:void(0)" class="enlarge-button">
-                            <img src="{{ STATIC_URL }}files_widget/img/enlarge_button.png" />
-                        </a>
-                        <a href="javascript:void(0)" class="remove-button">
-                            <img src="{{ STATIC_URL }}files_widget/img/close_button.png" />
-                        </a>
-                    </span>
-                </span>
-            </div>
-        {% endspaceless %}{% endfor %}
     </div>
     <div class="controls">
         <!--[if lt IE 9]>
-            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+            <script src="{% static 'js/html5shiv.min.js' %}"></script>
         <![endif]-->
         <a href="javascript:void(0)" class="fake-files-input">
             <span>{% trans 'Upload' %}...</span>
