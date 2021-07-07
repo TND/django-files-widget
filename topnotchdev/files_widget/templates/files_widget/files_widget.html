@@ -44,19 +44,6 @@
     <div class="files-widget-deleted" style="display: none">
         <p>{% trans 'Images to be removed' %}:</p>
         <div class="deleted-list">
-            {% for path_to_file in deleted_files.splitlines %}
-                <div class="deleted-file" data-image-path="{{ path_to_file }}">
-                    <span class="image-holder">
-                        <img class="icon" src="{% include 'files_widget/includes/thumbnail.html' %}"  />
-                    </span>
-                    <span class="name">{{ path_to_file|filename_from_path }}</span>
-                    <span class="undo">
-                        <a href="javascript:void(0);" class="undo-remove-button">
-                            Undo
-                        </a>
-                    </span>
-                </div>
-            {% endfor %}
         </div>
     </div>
 </div>
