@@ -12,6 +12,8 @@ urlpatterns = (
          url(r"demo2$", views.ImagesWidgetTwoFieldsCreateView.as_view(), name="demo2-create"),
          path("update/<int:pk>", views.ImagesWidgetUpdateView.as_view(), name="demo-update"),
          path("update2/<int:pk>", views.ImagesWidgetTwoFieldsUpdateView.as_view(), name="demo2-update"),
+         path("generic", views.Demo3GenericView.as_view(), name="demo3")
+
 
          ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
            + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,7 +1,8 @@
 from django.urls import reverse
 from django.views import generic
+from django.http import HttpResponse
 
-from .forms import DemoImagesForm, DemoImagesTwoImageFieldsForm
+from .forms import DemoImagesForm, DemoImagesTwoImageFieldsForm, Demo3NonModelForm
 from .models import MyModel, MyModelTwoFields
 
 
@@ -51,3 +52,21 @@ class ImagesWidgetTwoFieldsUpdateView(generic.UpdateView):
         context = super().get_context_data(**kwargs)
         context["description"] = "Update Images (two image fields)"
         return context
+
+
+class Demo3GenericView(generic.FormView):
+    form_class = Demo3NonModelForm
+    template_name = "form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["description"] = "Generic View (no db saving)"
+        return context
+
+    def form_valid(self, form):
+        result = form.cleaned_data
+
+        context = self.get_context_data(form=form)
+        context.update({"result": result})
+
+        return self.render_to_response(context)

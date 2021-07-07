@@ -8,4 +8,15 @@ Fixme: Here we cannot add form.media, otherwise it will result in duplicated ren
     {{ form.media }}
 {% endcomment %}
     {% crispy form %}
+
+{% if result %}
+
+<div>
+    <h2>Result:</h2>
+    {{ result}}
+</div>
+
+{% endif %}
+
+
 {% endblock %}
