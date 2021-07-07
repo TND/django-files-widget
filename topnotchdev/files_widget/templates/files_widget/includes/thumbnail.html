@@ -1,1 +1,0 @@
-{% load thumbnail files_widget_tags %}{% thumbnail path_to_file|unquote preview_size|add:'x'|add:preview_size upscale=False format=path_to_file|thumbnail_format as thumb %}{{ thumb.url }}{% endthumbnail %}
