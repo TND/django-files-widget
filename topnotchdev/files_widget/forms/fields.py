@@ -26,7 +26,6 @@ class FilesFormField(forms.MultiValueField):
                    forms.CharField(required=False), ),
             }
         )
-        print(kwargs)
         super(FilesFormField, self).__init__(**kwargs)
 
     def compress(self, data_list):

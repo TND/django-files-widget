@@ -5,7 +5,7 @@ from sorl.thumbnail import get_thumbnail
 
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 
 from .files import save_upload
 from .controllers import FilePath, ImagePath
@@ -20,6 +20,7 @@ def thumbnail_format(path):
     return 'JPEG'
 
 
+@login_required()
 @permission_required('files_widget.can_upload_files')
 def upload(request):
     if not request.method == 'POST':
@@ -67,6 +68,7 @@ def upload(request):
     }))
 
 
+@login_required()
 @permission_required('files_widget.can_upload_files')
 def thumbnail_url(request):
     if not 'img' in request.GET or not 'preview_size' in request.GET:

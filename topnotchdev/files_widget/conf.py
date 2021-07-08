@@ -3,9 +3,14 @@ from django.core.exceptions import ImproperlyConfigured
 
 MEDIA_URL = getattr(settings, 'MEDIA_URL')
 MEDIA_ROOT = getattr(settings, 'MEDIA_ROOT')
+
+# These are subfolder name in the storage
 TEMP_DIR = getattr(settings, 'FILES_WIDGET_TEMP_DIR', 'temp/files_widget/')
-TEMP_DIR_FORMAT = getattr(settings, 'FILES_WIDGET_TEMP_DIR_FORMAT', '%4d-%02d-%02d-%02d-%02d')
 FILES_DIR = getattr(settings, 'FILES_WIDGET_FILES_DIR', 'uploads/files_widget/')
+
+TEMP_DIR_FORMAT = getattr(settings, 'FILES_WIDGET_TEMP_DIR_FORMAT', '%4d-%02d-%02d-%02d-%02d')
+
+
 OLD_VALUE_STR = getattr(settings, 'FILES_WIDGET_OLD_VALUE_STR', 'old_%s_value')
 DELETED_VALUE_STR = getattr(settings, 'FILES_WIDGET_DELETED_VALUE_STR', 'deleted_%s_value')
 MOVED_VALUE_STR = getattr(settings, 'FILES_WIDGET_MOVED_VALUE_STR', 'moved_%s_value')

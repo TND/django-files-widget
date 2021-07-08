@@ -1,6 +1,5 @@
 from django.urls import reverse
 from django.views import generic
-from django.http import HttpResponse
 
 from .forms import DemoImagesForm, DemoImagesTwoImageFieldsForm, Demo3NonModelForm
 from .models import MyModel, MyModelTwoFields
@@ -66,7 +65,20 @@ class Demo3GenericView(generic.FormView):
     def form_valid(self, form):
         result = form.cleaned_data
 
-        context = self.get_context_data(form=form)
-        context.update({"result": result})
+        images = result["avatar"].splitlines()
+        from topnotchdev.files_widget.files import FormFileHandler
+        actual_images = []
+        changed = False
+        for image in images:
 
-        return self.render_to_response(context)
+            # For non model forms, we use this handler to move the temp file to permanent storage.
+            fhandler = FormFileHandler(image, user=self.request.user)
+            new_path, path_changed = fhandler.move_to_permanent_directory()
+            actual_images.append(new_path)
+            if path_changed:
+                changed = True
+
+        result["new_images"] = "\n".join(actual_images)
+
+        from django.conf import settings
+        return self.render_to_response({"result": result, "image_paths": actual_images, "MEDIA_URL": settings.MEDIA_URL})
