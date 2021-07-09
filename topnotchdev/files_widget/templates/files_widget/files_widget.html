@@ -1,10 +1,10 @@
-{% load i18n files_widget_tags static %}
+{% load i18n static %}
 {% block images_widget_html %}
 <div class="files-widget">
     {% block images_widget_html_dropbox %}
     <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}"
          data-upload-url="{% url 'files_widget_upload' %}"
-         data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}"
+         data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{% get_media_prefix %}"
          data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}">
         <span class="message">
             {% block dropbox-hint %}

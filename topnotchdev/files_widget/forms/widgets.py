@@ -77,7 +77,6 @@ class BaseFilesWidget(forms.MultiWidget):
         files, deleted_files, moved_files = value
 
         context = {
-            'MEDIA_URL': settings.MEDIA_URL,
             'use_filebrowser': use_filebrowser(),
             'add_image_by_url': ADD_IMAGE_BY_URL,
             'input_string': super(BaseFilesWidget, self).render(name, value, attrs, renderer),
