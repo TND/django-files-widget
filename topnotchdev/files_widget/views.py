@@ -1,14 +1,26 @@
 import json
+import re
+
+from sorl.thumbnail import get_thumbnail
 
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from django.template.loader import render_to_string
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 
 from .files import save_upload
 from .controllers import FilePath, ImagePath
 
+
+def thumbnail_format(path):
+    match = re.search(r'\.\w+$', path)
+    if match:
+        ext = match.group(0)
+        if ext.lower() in ['.gif', '.png']:
+            return 'PNG'
+    return 'JPEG'
+
+
+@login_required()
 @permission_required('files_widget.can_upload_files')
 def upload(request):
     if not request.method == 'POST':
@@ -34,24 +46,29 @@ def upload(request):
     except StopIteration:
         return HttpResponseBadRequest(json.dumps({
             'success': False,
-            'message': 'Error while uploading file.',
+            'message': _('Error while uploading file.'),
         }))
     filename = upload.name
     
     path_to_file = save_upload(upload, filename, is_raw, request.user)
-    MEDIA_URL = settings.MEDIA_URL
 
     if 'preview_size' in request.POST:
         preview_size = request.POST['preview_size']
     else:
         preview_size = '64'
 
+    thumbnail = get_thumbnail(
+        path_to_file, geometry_string="%sx%s" % (preview_size, preview_size),
+        upscale=False, format=thumbnail_format(path_to_file))
+
     return HttpResponse(json.dumps({
         'success': True,
         'imagePath': path_to_file,
-        'thumbnailPath': render_to_string('files_widget/includes/thumbnail.html', locals()),
+        'thumbnailPath': thumbnail.url,
     }))
 
+
+@login_required()
 @permission_required('files_widget.can_upload_files')
 def thumbnail_url(request):
     if not 'img' in request.GET or not 'preview_size' in request.GET:

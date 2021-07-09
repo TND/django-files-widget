@@ -1,77 +1,118 @@
-{% load i18n files_widget_tags %}
+{% load i18n static %}
+{% block images_widget_html %}
 <div class="files-widget">
-    <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}" data-upload-url="{% url 'files_widget_upload' %}" data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{{ MEDIA_URL }}" data-static-url="{{ STATIC_URL }}" data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}" data-undo-text="{% trans 'undo' %}">
+    {% block images_widget_html_dropbox %}
+    <div class="files-widget-dropbox" id="{{ name }}-dropbox" data-input-name="{{ name }}"
+         data-upload-url="{% url 'files_widget_upload' %}"
+         data-get-thumbnail-url="{% url 'files_widget_get_thumbnail_url' %}" data-media-url="{% get_media_prefix %}"
+         data-multiple="{{ multiple }}" data-preview-size="{{ preview_size }}">
         <span class="message">
-            {% if multiple %}
-                {% trans 'Drop multiple images here to upload' %}
-            {% else %}
-                {% trans 'Drop an image here to upload' %}
-            {% endif %}
+            {% block dropbox-hint %}
+                {% if multiple %}
+                    {% trans 'Drop multiple images here to upload' %}
+                {% else %}
+                    {% trans 'Drop an image here to upload' %}
+                {% endif %}
+            {% endblock %}
         </span>
-        {% for path_to_file in files.splitlines %}{% spaceless %}
-            <div class="preview" data-image-path="{{ path_to_file }}">
-                <span class="image-holder">
-                    <img class="thumbnail" src="{% include 'files_widget/includes/thumbnail.html' %}" />
-                    <span class="buttons">
-                        <a href="javascript:void(0)" class="enlarge-button">
-                            <img src="{{ STATIC_URL }}files_widget/img/enlarge_button.png" />
-                        </a>
-                        <a href="javascript:void(0)" class="remove-button">
-                            <img src="{{ STATIC_URL }}files_widget/img/close_button.png" />
-                        </a>
-                    </span>
-                </span>
-            </div>
-        {% endspaceless %}{% endfor %}
     </div>
-    <div class="controls">
-        <!--[if lt IE 9]>
-            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
-        <a href="javascript:void(0)" class="fake-files-input">
-            <span>{% trans 'Upload' %}...</span>
-            <input type="file" class="files-input" id="{{ name }}-files" multiple="mulitple" />
-        </a>
-        {% if use_filebrowser %}
-            &nbsp;|&nbsp;
-            <a href="javascript:void(0)" class="media-library-button">{% trans 'Library' %}</a>
-        {% endif %}
-        {% if add_image_by_url %}
+    {% endblock %}
+
+    {% block images_widget_html_input %}
+    {{ input_string }}
+    {% endblock %}
+
+    {% block images_widget_html_control %}
+        {% if not uploader_disabled %}
+        <div class="controls">
+            <!--[if lt IE 9]>
+            <script src="{% static 'files_widget/js/html5shiv.min.js' %}"></script>
+            <![endif]-->
+            <a href="javascript:void(0)" class="fake-files-input">
+                <span>{% trans 'Upload' %}...</span>
+                <input type="file" class="files-input" id="{{ name }}-files" multiple="mulitple"/>
+            </a>
+
+            {% if use_filebrowser %}
+                &nbsp;|&nbsp;
+                <a href="javascript:void(0)" class="media-library-button">{% trans 'Library' %}</a>
+            {% endif %}
+
+            {% if add_image_by_url %}
             &nbsp;|&nbsp;
             <a href="javascript:void(0)" class="add-by-url-button">{% trans 'Add by url...' %}</a>
             <span class="add-by-url-container" style="display: none">
-                <input type="text" class="add-by-url" placeholder="{% trans 'Add by url...' %}" />
+                <input type="text" class="add-by-url" placeholder="{% trans 'Add by url...' %}"/>
             </span>
-        {% endif %}
-        {{ input_string }}
-        {# here comes the hacked mezzanine-filebrowser-safe integration #}
-        <span class="hacked-filebrowser-integration" style="display: none !important;">
-            <input type="hidden" id="{{ name }}-filebrowser-result" class="filebrowser-result" />
-            <img id="image_{{ name }}-filebrowser-result" />
-            <a id="link_{{ name }}-filebrowser-result"></a>
-            <img id="previewimage_{{ name }}-filebrowser-result" />
-            <a id="previewlink_{{ name }}-filebrowser-result"></a>
-            <span id="help_{{ name }}-filebrowser-result"></span>
-            <span id="preview_{{ name }}-filebrowser-result"></span>
-        </span>
-        <span class="upload-progress-stats"></span>
-    </div>
-    <div class="files-widget-deleted" style="display: none">
-        <p>{% trans 'Images to be removed' %}:</p>
-        <div class="deleted-list">
-            {% for path_to_file in deleted_files.splitlines %}
-                <div class="deleted-file" data-image-path="{{ path_to_file }}">
-                    <span class="image-holder">
-                        <img class="icon" src="{% include 'files_widget/includes/thumbnail.html' %}"  />
-                    </span>
-                    <span class="name">{{ path_to_file|filename_from_path }}</span>
-                    <span class="undo">
-                        <a href="javascript:void(0);" class="undo-remove-button">
-                            Undo
-                        </a>
-                    </span>
-                </div>
-            {% endfor %}
+            {% endif %}
+            {# here comes the hacked mezzanine-filebrowser-safe integration #}
+            <span class="hacked-filebrowser-integration" style="display: none !important;">
+                    <input type="hidden" id="{{ name }}-filebrowser-result" class="filebrowser-result"/>
+                    <img id="image_{{ name }}-filebrowser-result"/>
+                    <a id="link_{{ name }}-filebrowser-result"></a>
+                    <img id="previewimage_{{ name }}-filebrowser-result"/>
+                    <a id="previewlink_{{ name }}-filebrowser-result"></a>
+                    <span id="help_{{ name }}-filebrowser-result"></span>
+                    <span id="preview_{{ name }}-filebrowser-result"></span>
+                </span>
+            <span class="upload-progress-stats"></span>
         </div>
-    </div>
+        <div class="files-widget-deleted" style="display: none">
+            <p>{% trans 'Images to be removed' %}:</p>
+            <div class="deleted-list">
+            </div>
+        </div>
+        {% endif %}
+    {% endblock %}
 </div>
+{% endblock %}
+
+
+{% block images_widget_js %}
+<script>
+    {% block images_widget_preview_js %}
+    {% if not uploader_disabled %}
+    var removeButtonHtml =
+        '<a href="javascript:void(0)" class="remove-button">' +
+        '<img src="{% static 'files_widget/img/close_button.png' %}" />' +
+        '</a>';
+
+    {% else %}
+    var removeButtonHtml = "";
+
+    {% endif %}
+        var previewTemplate =
+            '<div class="new preview">' +
+                '<span class="image-holder">' +
+                    '<img class="thumbnail" />' +
+                    '<span class="buttons">' +
+                        '<a href="javascript:void(0)" class="enlarge-button">' +
+                            '<img src="{% static 'files_widget/img/enlarge_button.png' %}" />' +
+                        '</a> ' + removeButtonHtml +
+                    '</span>' +
+                '</span>' +
+                '<div class="progress-holder"><div class="progress"></div></div>' +
+            '</div>';
+
+    {% endblock %}
+
+    {% if not uploader_disabled %}
+    {% block images_widget_delete_js %}
+        var deletedTemplate =
+            '<div class="deleted-file">' +
+                '<span class="image-holder">' +
+                    '<img class="icon" />' +
+                '</span>' +
+                '<span class="name"></span>' +
+                '<span class="undo">' +
+                    '<a href="javascript:void(0);" class="undo-remove-button">' +
+                    "{% trans 'Undo' %}" +
+                    '</a>' +
+                '</span>' +
+            '</div>';
+    {% endblock %}
+    {% endif %}
+
+</script>
+
+{% endblock %}

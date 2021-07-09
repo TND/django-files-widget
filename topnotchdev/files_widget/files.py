@@ -1,66 +1,137 @@
 import os, os.path
-from io import FileIO, BufferedWriter
-import re
 import time
 
-from django.conf import settings
-from django.core.files.storage import default_storage
-from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
+from django.core.files.storage import default_storage as storage
 from django.template.defaultfilters import slugify
 
 from .conf import *
 
 
-def filename_from_path(path):
-    return re.sub(r'^.+/', '', path)
+class NewTempFileHandler(object):
+    def __init__(self, filename, user):
+        self.filename = filename
+        self.user = user
 
-def model_slug(model):
-    return slugify(model._meta.verbose_name_plural)
+    @classmethod
+    def get_temp_dir_name(cls, user):
+        now = time.localtime()[0:5]
+        dir_name = TEMP_DIR_FORMAT % now
+        return os.path.join(dir_name, str(user.pk))
 
-def construct_temp_path(user):
-    now = time.localtime()[0:5]
-    dir_name = TEMP_DIR_FORMAT % now
-    return os.path.join(TEMP_DIR, dir_name, str(user.pk))
+    @classmethod
+    def construct_temp_path(cls, user):
+        return os.path.join(TEMP_DIR, cls.get_temp_dir_name(user))
 
-def construct_permanent_path(instance):
-    model_dir = model_slug(type(instance))
-    return os.path.join(FILES_DIR, model_dir, str(instance.pk))
+    @cached_property
+    def get_potential_temp_file_path(self):
+        dir_name = self.construct_temp_path(self.user)
+        return os.path.join(dir_name, self.filename)
 
-def in_directory(path, directory):
-    # don't try to manipulate with ../../
-    full_path = os.path.join(MEDIA_ROOT, path)
-    return path.startswith(directory) and full_path == os.path.realpath(full_path)
+    def save_upload(self, uploaded, raw_data):
+        if raw_data:
+            result = storage.save(self.get_potential_temp_file_path, raw_data)
+        else:
+            result = storage.save(self.get_potential_temp_file_path, uploaded)
+        return result
 
-def in_permanent_directory(path, instance):
-    full_path = os.path.join(MEDIA_ROOT, path)
-    return path.startswith(construct_permanent_path(instance)) and full_path == os.path.realpath(full_path)
 
-def make_temp_directory(filename, user):
-    public_dir = construct_temp_path(user)
-    full_dir = os.path.join(settings.MEDIA_ROOT, public_dir)
+class FileHandlerBase(object):
+    def __init__(self, file_path):
+        self.file_path = file_path
 
-    try:
-        if not os.path.exists(full_dir):
-            os.makedirs(full_dir)
-    except EnvironmentError:
-        # deepest dir already exists
-        pass
+    @cached_property
+    def file_name(self):
+        return os.path.split(self.file_path)[-1]
 
-    full_path = os.path.join(full_dir, filename)
-    available_full_path = default_storage.get_available_name(full_path)
-    return available_full_path
+    @cached_property
+    def is_temp_file(self):
+        return storage.exists(self.file_path) and self.file_path.startswith(TEMP_DIR)
 
-def make_permanent_directory(temp_path, instance):
-    public_dir = construct_permanent_path(instance)
-    filename = filename_from_path(temp_path)
-    full_dir = os.path.join(MEDIA_ROOT, public_dir)
+    @cached_property
+    def is_permanent_file(self):
+        return storage.exists(self.file_path) and self.file_path.startswith(FILES_DIR)
 
-    if not os.path.exists(full_dir):
-        os.makedirs(full_dir)
+    @cached_property
+    def target_perm_path(self):
+        return storage.get_available_name(os.path.join(self.perm_file_dir, self.file_name))
 
-    full_path = os.path.join(full_dir, filename)
-    available_full_path = default_storage.get_available_name(full_path)
-    return available_full_path
+    @cached_property
+    def perm_file_dir(self):
+        return self.get_perm_file_dir()
+
+    def get_perm_file_dir(self):
+        # This is supposed to be used by non-model submission.
+        raise NotImplementedError
+
+    def create_full_os_path_target_dir(self):
+        # storage api has no move method, we need to create to folder first.
+        os.makedirs(storage.path(self.perm_file_dir), exist_ok=True)
+
+    def move_to_permanent_directory(self):
+        if self.is_permanent_file:
+            return self.file_path, False
+
+        # todo: when does this happen?
+        if self.file_path.startswith('/') or self.file_path.find('//') != -1:
+            return self.file_path, False
+
+        try:
+            self.create_full_os_path_target_dir()
+            os.link(storage.path(self.file_path), storage.path(self.target_perm_path))
+        except EnvironmentError as e:
+            return self.try_to_recover_path()
+
+        if self.is_temp_file:
+            try:
+                storage.delete(self.file_path)
+            except EnvironmentError:
+                return self.try_to_recover_path()
+
+        return self.target_perm_path, True
+
+    def try_to_recover_path(self):
+        # This happens when errored while trying to move a temp file to a perm file.
+        # We do this to link the temp file back.
+        if os.path.exists(self.target_perm_path):
+            return self.target_perm_path, True
+        else:
+            return self.file_path, False
+
+    def delete_this_file(self):
+        if self.is_permanent_file or self.is_temp_file:
+            try:
+                storage.delete(self.file_path)
+            except EnvironmentError:
+                pass
+
+
+class ModelFileHandler(FileHandlerBase):
+    def __init__(self, file_path, instance):
+        super(ModelFileHandler, self).__init__(file_path)
+        self.instance = instance
+
+    @classmethod
+    def model_slug(cls, model):
+        return slugify(model._meta.verbose_name_plural)
+
+    def construct_permanent_path(self):
+        model_dir = self.model_slug(type(self.instance))
+        return os.path.join(FILES_DIR, model_dir, str(self.instance.pk))
+
+    def get_perm_file_dir(self):
+        return self.construct_permanent_path()
+
+
+class FormFileHandler(FileHandlerBase):
+    def __init__(self, file_path, user):
+        super(FormFileHandler, self).__init__(file_path)
+        self.user = user
+
+    def get_perm_file_dir(self):
+        assert self.user is not None
+        return os.path.join(FILES_DIR, "non_model_form_upload", str(self.user.pk))
+
 
 def save_upload(uploaded, filename, raw_data, user):
     '''
@@ -70,59 +141,9 @@ def save_upload(uploaded, filename, raw_data, user):
     submission and is a regular Django UploadedFile in request.FILES
     '''
 
-    path = make_temp_directory(filename, user)
-    public_path = path.replace(MEDIA_ROOT, '', 1)
+    fhandler = NewTempFileHandler(filename, user)
+    return fhandler.save_upload(uploaded, raw_data)
 
-    #try:
-    with BufferedWriter(FileIO(path, "wb")) as dest:
-        # if the "advanced" upload, read directly from the HTTP request
-        # with the Django 1.3 functionality
-        if raw_data:
-            foo = uploaded.read(1024)
-            while foo:
-                dest.write(foo)
-                foo = uploaded.read(1024)
-        # if not raw, it was a form upload so read in the normal Django chunks fashion
-        else:
-            for c in uploaded.chunks():
-                dest.write(c)
-        # got through saving the upload, report success
-        return public_path
-    #except IOError:
-        # could not open the file most likely
-    #    pass
-    return False
-
-def try_to_recover_path(temp_path, instance):
-    filename = filename_from_path(temp_path)
-    permanent_directory = construct_permanent_path(instance)
-    permanent_path = os.path.join(permanent_directory, filename)
-    full_path = os.path.join(MEDIA_ROOT, permanent_path)
-    if os.path.exists(full_path):
-        return permanent_path, True
-    else:
-        return temp_path, False
-
-def move_to_permanent_directory(temp_path, instance):
-    if temp_path.startswith('/') or temp_path.find('//') != -1 \
-            or in_permanent_directory(temp_path, instance):
-        return temp_path, False
-
-    full_path = make_permanent_directory(temp_path, instance)
-    public_path = full_path.replace(MEDIA_ROOT, '', 1)
-    full_temp_path = os.path.join(MEDIA_ROOT, temp_path)
-    try:
-        os.link(full_temp_path, full_path)
-    except EnvironmentError:
-        return try_to_recover_path(temp_path, instance)
-
-    if in_directory(temp_path, TEMP_DIR):
-        try:
-            os.remove(full_temp_path)
-        except EnvironmentError:
-            return try_to_recover_path(temp_path, instance)
-
-    return public_path, True
 
 def manage_files_on_disk(sender, instance, **kwargs):
     # Receiver of Django post_save signal.
@@ -164,23 +185,22 @@ def manage_files_on_disk(sender, instance, **kwargs):
         #                if in temp dir, delete
         #   OCD  (ERROR) show warning message after save
 
+        print("post_save: current %s; deleted %s; old %s" % (current_images, deleted_images, old_images))
+
         for img in current_images:
             # OC-, -C-, OCD & -CD
-            new_path = img
-            if in_directory(img, TEMP_DIR) or in_directory(img, FILES_DIR):
-                new_path, path_changed = move_to_permanent_directory(img, instance)
-                if path_changed:
-                    changed = True
-                new_images.append(new_path)
+            fhandler = ModelFileHandler(img, instance)
+            new_path, path_changed = fhandler.move_to_permanent_directory()
+            if path_changed:
+                changed = True
+            new_images.append(new_path)
 
         for img in deleted_images:
             if img not in current_images:
                 # --D & O-D
-                if in_permanent_directory(img, instance) or in_directory(img, TEMP_DIR):
-                    try:
-                        os.remove(os.path.join(MEDIA_ROOT, img))
-                    except EnvironmentError as e:
-                        pass
+                fhandler = ModelFileHandler(img, instance)
+                if fhandler.is_temp_file or fhandler.is_permanent_file:
+                    fhandler.delete_this_file()
 
         for img in old_images:
             if img not in current_images and img not in deleted_images and img not in moved_images:

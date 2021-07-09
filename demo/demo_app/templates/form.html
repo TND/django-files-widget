@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+{% comment %}
+Fixme: Here we cannot add form.media, otherwise it will result in duplicated rendering.
+    {{ form.media }}
+{% endcomment %}
+{% if form %}
+    {% crispy form %}
+{% endif %}
+
+{% if result %}
+
+<div>
+    <h2>Result:</h2>
+    {{ result}}
+
+    {% if image_paths %}
+    <div class="container">
+        {% for p in image_paths %}
+            <img src="{{MEDIA_URL}}{{p}}" style="max-width: 100%">
+        {% endfor %}
+    {% endif %}
+    </div>
+
+</div>
+
+{% endif %}
+
+
+{% endblock %}

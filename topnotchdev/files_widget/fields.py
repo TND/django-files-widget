@@ -7,18 +7,19 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from .forms import FilesFormField, BaseFilesWidget, FileWidget, FilesWidget, ImageWidget, ImagesWidget
+from .forms import BaseFilesWidget, FileWidget, FilesWidget, ImageWidget, ImagesWidget
 from .files import manage_files_on_disk
 from . import controllers
 from .conf import *
+from .forms.fields import FileFormField, FilesFormField, ImageFormField, ImagesFormField
 
 
-def formfield_defaults(self, default_widget=None, widget=None, form_class=FilesFormField, required=True, **kwargs):
+def formfield_defaults(self, default_widget=None, widget=None, required=True, **kwargs):
     if not isinstance(widget, BaseFilesWidget):
         widget = default_widget
 
     defaults = {
-        'form_class': FilesFormField,
+        'form_class': self._get_form_class(),
         'fields': (forms.CharField(required=required), forms.CharField(required=False), forms.CharField(required=False), ),
         'widget': widget,
     }
@@ -57,6 +58,10 @@ class FileField(models.CharField):
         defaults = formfield_defaults(self, default_widget, **kwargs)
         return super(FileField, self).formfield(**defaults)
 
+    @staticmethod
+    def _get_form_class():
+        return FileFormField
+
 
 class FilesField(models.TextField):
     description = _("Files")
@@ -75,6 +80,10 @@ class FilesField(models.TextField):
         defaults = formfield_defaults(self, default_widget, **kwargs)
         return super(FilesField, self).formfield(**defaults)
 
+    @staticmethod
+    def _get_form_class():
+        return FilesFormField
+
 
 class ImageField(FileField):
     description = _("Image")
@@ -84,6 +93,10 @@ class ImageField(FileField):
         defaults = formfield_defaults(self, default_widget, **kwargs)
         return super(ImageField, self).formfield(**defaults)
 
+    @staticmethod
+    def _get_form_class():
+        return ImageFormField
+
 
 class ImagesField(FilesField):
     description = _("Images")
@@ -92,6 +105,10 @@ class ImagesField(FilesField):
     def formfield(self, default_widget=ImagesWidget(), **kwargs):
         defaults = formfield_defaults(self, default_widget, **kwargs)
         return super(ImagesField, self).formfield(**defaults)
+
+    @staticmethod
+    def _get_form_class():
+        return ImagesFormField
 
 
 try:

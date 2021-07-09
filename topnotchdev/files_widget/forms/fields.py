@@ -10,8 +10,22 @@ class UnicodeWithAttr(six.text_type):
     deleted_files = None
     moved_files = None
 
+
 class FilesFormField(forms.MultiValueField):
-    def __init__(self, max_length=None, **kwargs):
+    def __init__(self, max_length=None, multiple=True, preview_size=64, **kwargs):
+        from topnotchdev.files_widget.forms.widgets import FilesWidget
+        kwargs.update(
+            {
+                "widget": FilesWidget(
+                    multiple=multiple,
+                    preview_size=preview_size
+                ),
+                'fields': (
+                   forms.CharField(required=kwargs.get("required")),
+                   forms.CharField(required=False),
+                   forms.CharField(required=False), ),
+            }
+        )
         super(FilesFormField, self).__init__(**kwargs)
 
     def compress(self, data_list):
@@ -60,3 +74,21 @@ class FilesFormField(forms.MultiValueField):
         self.validate(out)
         self.run_validators(out)
         return out
+
+
+class FileFormField(FilesFormField):
+    def __init__(self, max_length=None, multiple=False, preview_size=128, **kwargs):
+        super(FileFormField, self).__init__(
+            max_length, multiple, preview_size, **kwargs)
+
+
+class ImageFormField(FilesFormField):
+    def __init__(self, max_length=None, multiple=False, preview_size=258, **kwargs):
+        super(ImageFormField, self).__init__(
+            max_length, multiple, preview_size, **kwargs)
+
+
+class ImagesFormField(FilesFormField):
+    def __init__(self, max_length=None, multiple=True, preview_size=150, **kwargs):
+        super(ImagesFormField, self).__init__(
+            max_length, multiple, preview_size, **kwargs)
